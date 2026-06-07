@@ -81,7 +81,7 @@ const serviceDropdown = [
       </a>
 
       <a href={`${base}/contact`} class="nav-cta" data-cursor-expand>{t('nav.getQuote')}</a>
-      <NavDrawer links={navLinks} client:load />
+      <NavDrawer links={navLinks} ctaLabel={t('nav.getQuote')} ctaHref={`${base}/contact`} client:load />
     </div>
 
   </div>
