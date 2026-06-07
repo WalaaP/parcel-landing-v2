@@ -190,6 +190,8 @@ export default defineType({
           defineField({ name: 'id',          title: 'ID (instant / sameday / nextday)', type: 'string' }),
           defineField({ name: 'tier',        title: 'Tier Name',        type: 'string' }),
           defineField({ name: 'badge',       title: 'Badge Text',       type: 'string' }),
+          defineField({ name: 'tagline',     title: 'Card Tagline',     type: 'string', description: 'One-line subtitle shown on the home page card' }),
+          defineField({ name: 'image',       title: 'Card Background Image URL', type: 'string' }),
           defineField({ name: 'accentColor', title: 'Accent Color hex', type: 'string' }),
           defineField({ name: 'headline',    title: 'Headline',         type: 'string' }),
           defineField({ name: 'desc',        title: 'Description',      type: 'text', rows: 4 }),

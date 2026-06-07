@@ -48,7 +48,7 @@ export const siteSettingsQuery = `*[_type == "siteSettings" && language == $lang
   appSection { tag, title, titleEm, sub, appStoreLbl, appStoreHref, googlePlayLbl, googlePlayHref },
   ctaSection { tag, title, titleEm, sub, primaryLabel, primaryHref, ghostLabel, ghostHref, footnote },
   footer { tagline, operatingHours, copyrightSuffix, builtFor },
-  services[] { id, tier, badge, accentColor, headline, desc, features[], coverage, window },
+  services[] { id, tier, badge, tagline, image, accentColor, headline, desc, features[], coverage, window },
   servicesFaqs[] { question, answer },
   ecommerceIntegrations[] { icon, name, desc },
   ecommerceApiFeatures[],

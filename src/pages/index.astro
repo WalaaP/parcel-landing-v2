@@ -29,6 +29,7 @@ let sanityHowItWorks:     any           | undefined
 let sanityWhyUs:          any           | undefined
 let sanityApp:            any           | undefined
 let sanityServicesHdr:    any           | undefined
+let sanityServicesCards:  any[]         | undefined
 let sanityEcommerceHdr:   any           | undefined
 let sanityClientsHdr:     any           | undefined
 
@@ -51,9 +52,10 @@ if (configured) {
     if (settings?.howItWorks?.tag)             sanityHowItWorks   = settings.howItWorks
     if (settings?.whyUs?.tag)                  sanityWhyUs        = settings.whyUs
     if (settings?.appSection?.tag)             sanityApp          = settings.appSection
-    if (settings?.servicesSection?.tag)        sanityServicesHdr  = settings.servicesSection
-    if (settings?.ecommerceSection?.tag)       sanityEcommerceHdr = settings.ecommerceSection
-    if (settings?.clientsSection?.tag)         sanityClientsHdr   = settings.clientsSection
+    if (settings?.servicesSection?.tag)        sanityServicesHdr   = settings.servicesSection
+    if (settings?.services?.length)            sanityServicesCards = settings.services
+    if (settings?.ecommerceSection?.tag)       sanityEcommerceHdr  = settings.ecommerceSection
+    if (settings?.clientsSection?.tag)         sanityClientsHdr    = settings.clientsSection
 
     if (rawClients?.length) {
       sanityClients = rawClients.map((c: any) => ({
@@ -83,7 +85,7 @@ if (configured) {
   <HeroSection hero={sanityHero} tickerItems={sanityTicker} />
   <StatsSection stats={sanityStats} />
   <SectionDivider />
-  <ServicesSection servicesSection={sanityServicesHdr} />
+  <ServicesSection servicesSection={sanityServicesHdr} services={sanityServicesCards} />
   <SectionDivider />
   <TechSection techSection={sanityTech} />
   <SectionDivider />

@@ -148,6 +148,8 @@ const siteSettingsEn = {
   services: [
     {
       id: 'instant', tier: 'INSTANT', badge: '⚡ FASTEST', accentColor: '#ff4d4d',
+      tagline: 'Delivered within hours. City-wide.',
+      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=85',
       headline: 'Within Hours, City-Wide.',
       desc: "When urgency is non-negotiable, Instant delivery is your answer. A courier is matched to your order within minutes and dispatched immediately. Built for medical supply chains, luxury retail, and any business where every hour counts.",
       features: ['Courier matched in under 5 minutes', 'GPS updated every 30 seconds', 'Live ETA with real-time recalculation', 'Contactless or signed delivery', 'Immediate proof of delivery (photo + GPS)', 'Priority routing over all other tiers'],
@@ -155,6 +157,8 @@ const siteSettingsEn = {
     },
     {
       id: 'sameday', tier: 'SAME DAY', badge: '★ MOST POPULAR', accentColor: '#fed12c',
+      tagline: 'Order today. In your hands today.',
+      image: 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=900&q=85',
       headline: 'Order Now. In Hands by Evening.',
       desc: "Parcel's most popular tier. Smart multi-stop routing means multiple orders can be batched efficiently — giving you competitive pricing without compromising on speed. Most deliveries complete before close of business.",
       features: ['Smart batched route optimization', 'Automated dispatch via Parcel AI', 'Proactive SMS + email at every stage', 'Contactless or signed delivery', 'Full digital proof of delivery', 'Merchant analytics dashboard access'],
@@ -162,6 +166,8 @@ const siteSettingsEn = {
     },
     {
       id: 'nextday', tier: 'NEXT DAY', badge: '◈ BEST VALUE', accentColor: '#14507a',
+      tagline: 'Scheduled precision. Nationwide.',
+      image: 'https://images.unsplash.com/photo-1553413077-190dd305871c?w=900&q=85',
       headline: 'Scheduled Precision, Nationwide.',
       desc: "For planned deliveries and high-volume businesses, Next Day gives you the best rates with complete reliability. Flexible pickup windows, consolidated warehousing, and coverage across the entire GCC make this the backbone for e-commerce operations.",
       features: ['Flexible morning, afternoon, or evening pickup', 'Warehousing & consolidation available', 'Volume pricing for 50+ orders/day', 'API integration for auto-booking', 'Full GCC coverage (BH, SA, UAE, KW, QA, OM)', 'Monthly consolidated invoicing'],
@@ -370,6 +376,8 @@ const siteSettingsAr = {
   services: [
     {
       id: 'instant', tier: 'فوري', badge: '⚡ فوري', accentColor: '#ff4d4d',
+      tagline: 'توصيل خلال ساعات. داخل المدينة.',
+      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=85',
       headline: 'في غضون ساعات، في جميع أنحاء المدينة.',
       desc: 'عندما تكون العجلة أمراً لا يُتنازل عنه، التوصيل الفوري هو الإجابة. يُطابَق ساعٍ بطلبك في غضون دقائق ويُرسَل فوراً. مبني لسلاسل توريد المستلزمات الطبية، تجزئة الفاخرة، وأي عمل تجاري لا يتحمّل التأخير.',
       features: ['مطابقة ساعٍ في أقل من 5 دقائق', 'تحديث GPS كل 30 ثانية', 'وقت وصول متوقع مباشر مع إعادة حساب فورية', 'توصيل بدون تلامس أو بتوقيع', 'إثبات توصيل فوري (صورة + GPS)', 'توجيه أولوي على جميع المستويات الأخرى'],
@@ -377,6 +385,8 @@ const siteSettingsAr = {
     },
     {
       id: 'sameday', tier: 'نفس اليوم', badge: '🌅 نفس اليوم', accentColor: '#fed12c',
+      tagline: 'اطلب اليوم. في يدك اليوم.',
+      image: 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=900&q=85',
       headline: 'اطلب الآن. في اليدين بحلول المساء.',
       desc: 'المستوى الأكثر شعبية من بارسل. يعني التوجيه الذكي متعدد المحطات إمكانية تجميع طلبات متعددة بكفاءة — مما يمنحك أسعاراً تنافسية دون المساس بالسرعة. تكتمل معظم التوصيلات قبل نهاية ساعات العمل.',
       features: ['تحسين المسار الذكي المُجمَّع', 'إرسال تلقائي عبر بارسل AI', 'إشعارات SMS وبريد إلكتروني في كل مرحلة', 'توصيل بدون تلامس أو بتوقيع', 'إثبات توصيل رقمي كامل', 'لوحة تحليلات التاجر'],
@@ -384,6 +394,8 @@ const siteSettingsAr = {
     },
     {
       id: 'nextday', tier: 'اليوم التالي', badge: '📅 اليوم التالي', accentColor: '#8fa8be',
+      tagline: 'دقة مجدولة. تغطية وطنية.',
+      image: 'https://images.unsplash.com/photo-1553413077-190dd305871c?w=900&q=85',
       headline: 'دقة مجدولة، تغطية وطنية.',
       desc: 'للتوصيلات المخططة والشركات ذات الحجم الكبير، يمنحك اليوم التالي أفضل الأسعار مع موثوقية كاملة. نوافذ استلام مرنة، تخزين مدمج، وتغطية كاملة لجميع أنحاء دول الخليج تجعله الركيزة الأساسية لعمليات التجارة الإلكترونية.',
       features: ['نوافذ استلام مرنة: صباح أو ظهر أو مساء', 'تخزين وتوحيد متاح', 'أسعار الحجم لأكثر من 50 طلباً يومياً', 'تكامل API للحجز التلقائي', 'تغطية الخليج الكاملة (البحرين، السعودية، الإمارات، الكويت، قطر، عُمان)', 'فواتير شهرية موحدة'],

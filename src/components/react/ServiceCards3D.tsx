@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import type { Service } from '../../data/services'
 
-function ServiceCard({ service, index }: { service: Service; index: number }) {
+function ServiceCard({ service, index, learnMore }: { service: Service; index: number; learnMore: string }) {
   const cardRef = useRef<HTMLDivElement>(null)
   const [rotate, setRotate] = useState({ x: 0, y: 0 })
   const [hovered, setHovered] = useState(false)
@@ -65,7 +65,7 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
           ))}
         </ul>
         <a href={service.href} className="card-cta" style={{ background: service.accentColor, color: service.id === 'sameday' ? '#09273d' : '#fff' }}>
-          Learn More →
+          {learnMore}
         </a>
       </div>
 
@@ -158,11 +158,11 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
   )
 }
 
-export default function ServiceCards3D({ services }: { services: Service[] }) {
+export default function ServiceCards3D({ services, learnMore = 'Learn More →' }: { services: Service[]; learnMore?: string }) {
   return (
     <div style={{ padding: '0 var(--section-x) var(--section-y)', maxWidth: 'var(--max-width)', margin: '0 auto', display: 'flex', gap: '24px' }}>
       {services.map((service, i) => (
-        <ServiceCard key={service.id} service={service} index={i} />
+        <ServiceCard key={service.id} service={service} index={i} learnMore={learnMore} />
       ))}
 
       <style>{`
