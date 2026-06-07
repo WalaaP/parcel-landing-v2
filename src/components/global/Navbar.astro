@@ -144,6 +144,10 @@ const serviceDropdown = [
     flex: 1;
     justify-content: center;
   }
+
+  /* Keep link sequence identical to English (Services → Contact) in RTL */
+  :global([dir="rtl"]) .nav-links { direction: ltr; }
+  :global([dir="rtl"]) .nav-link  { direction: rtl; }
   .nav-link {
     display: flex;
     align-items: center;
