@@ -14,6 +14,7 @@ const title   = howItWorks?.title   ?? 'FROM ORDER'
 const titleEm = howItWorks?.titleEm ?? 'TO DOOR.'
 const sub     = howItWorks?.sub     ?? 'Four steps. Fully automated. Completely transparent.'
 const steps   = howItWorks?.steps?.length ? howItWorks.steps : localSteps
+const isRtl   = Astro.currentLocale === 'ar'
 ---
 
 <section class="section section--navy how-section">
@@ -35,7 +36,7 @@ const steps   = howItWorks?.steps?.length ? howItWorks.steps : localSteps
           <h3 class="step-title">{step.title}</h3>
           <p class="step-desc">{step.desc}</p>
           {i < steps.length - 1 && (
-            <div class="step-connector" aria-hidden="true">→</div>
+            <div class="step-connector" aria-hidden="true">{isRtl ? '←' : '→'}</div>
           )}
         </div>
       ))}
@@ -106,6 +107,11 @@ const steps   = howItWorks?.steps?.length ? howItWorks.steps : localSteps
     color: var(--signal);
     z-index: 2;
     opacity: 0.5;
+  }
+
+  :global([dir="rtl"]) .step-connector {
+    right: auto;
+    left: -12px;
   }
 
   @media (max-width: 1023px) {
