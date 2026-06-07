@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem \"c:\\\\Users\\\\Walaa\\\\OneDrive\\\\Desktop\\\\Projects\\\\landing-astro\" -Force)",
+      "Bash(bun --version)",
+      "Bash(bun create *)"
+    ]
+  }
+}

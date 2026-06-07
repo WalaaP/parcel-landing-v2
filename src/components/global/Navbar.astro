@@ -1,0 +1,254 @@
+---
+import NavDrawer from '../react/NavDrawer.tsx'
+import { useTranslations, getAlternatePath, getLang } from '../../i18n/utils'
+
+const locale      = Astro.currentLocale || 'en'
+const lang        = getLang(locale)
+const t           = useTranslations(locale)
+const currentPath = Astro.url.pathname
+const altPath     = getAlternatePath(currentPath, lang === 'en' ? 'ar' : 'en')
+const isArabic    = lang === 'ar'
+
+const base = isArabic ? '/ar' : ''
+
+const navLinks = [
+  { label: t('nav.services'),  href: `${base}/services`  },
+  { label: t('nav.tracking'),  href: `${base}/tracking`  },
+  { label: t('nav.ecommerce'), href: `${base}/ecommerce` },
+  { label: t('nav.clients'),   href: `${base}/clients`   },
+  { label: t('nav.blog'),      href: `${base}/blog`      },
+  { label: t('nav.contact'),   href: `${base}/contact`   },
+]
+
+const serviceDropdown = [
+  { label: t('nav.instant'), sub: t('nav.instantSub'), href: `${base}/services#instant`, color: 'var(--instant-red)' },
+  { label: t('nav.sameday'), sub: t('nav.samedaySub'), href: `${base}/services#sameday`, color: 'var(--signal)'      },
+  { label: t('nav.nextday'), sub: t('nav.nextdaySub'), href: `${base}/services#nextday`, color: 'var(--navy-light)'  },
+]
+---
+
+<nav id="navbar" role="navigation" aria-label="Main navigation">
+  <div class="nav-container">
+
+    <a href={isArabic ? '/ar' : '/'} class="logo" aria-label="Parcel — go to homepage">
+      <svg class="logo-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="28" height="28" rx="6" fill="var(--signal)" opacity="0.12"/>
+        <path d="M10 8h8a6 6 0 010 12h-4v4H10V8z" fill="var(--signal)"/>
+      </svg>
+      <span><em>Par</em>cel</span>
+    </a>
+
+    <ul class="nav-links" role="list">
+      {navLinks.map(link => (
+        <li class={link.label === t('nav.services') ? 'with-dropdown' : ''}>
+          <a
+            href={link.href}
+            class:list={['nav-link', { active: currentPath.startsWith(link.href) }]}
+            aria-current={currentPath.startsWith(link.href) ? 'page' : undefined}
+          >
+            {link.label}
+            {link.label === t('nav.services') && (
+              <svg width="10" height="10" viewBox="0 0 10 10" class="chevron" aria-hidden="true">
+                <path d="M2 3.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              </svg>
+            )}
+          </a>
+
+          {link.label === t('nav.services') && (
+            <div class="dropdown" role="menu">
+              <div class="dropdown-inner">
+                {serviceDropdown.map(d => (
+                  <a href={d.href} class="dropdown-item" role="menuitem">
+                    <span class="dropdown-dot" style={`background: ${d.color}`}></span>
+                    <div>
+                      <strong>{d.label}</strong>
+                      <span>{d.sub}</span>
+                    </div>
+                    <span class="dropdown-arrow">{isArabic ? '←' : '→'}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </li>
+      ))}
+    </ul>
+
+    <div class="nav-right">
+      <!-- Language switcher -->
+      <a href={altPath} class="lang-switch" aria-label="Switch language">
+        {isArabic ? 'EN' : 'ع'}
+      </a>
+
+      <a href={`${base}/contact`} class="nav-cta" data-cursor-expand>{t('nav.getQuote')}</a>
+      <NavDrawer links={navLinks} client:load />
+    </div>
+
+  </div>
+</nav>
+
+<style>
+  #navbar {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 9990;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    transition:
+      background var(--duration-base) ease,
+      backdrop-filter var(--duration-base) ease,
+      border-color var(--duration-base) ease,
+      transform var(--duration-base) var(--ease-out),
+      box-shadow var(--duration-base) ease;
+    border-bottom: 1px solid transparent;
+  }
+  #navbar.scrolled {
+    background: var(--surface-glass);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom-color: var(--border);
+    box-shadow: 0 1px 40px rgba(0,0,0,0.3);
+  }
+  #navbar.hidden { transform: translateY(-100%); }
+
+  .nav-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--section-x);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--ink);
+    flex-shrink: 0;
+    letter-spacing: -0.01em;
+  }
+  .logo em { color: var(--signal); font-style: normal; }
+  .logo-icon { width: 30px; height: 30px; }
+
+  .nav-links {
+    display: flex;
+    list-style: none;
+    gap: 6px;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+  }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: color var(--duration-fast) ease, background var(--duration-fast) ease;
+    position: relative;
+  }
+  .nav-link:hover  { color: var(--ink); background: rgba(255,255,255,0.05); }
+  .nav-link.active { color: var(--signal); }
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 12px; right: 12px;
+    height: 2px;
+    background: var(--signal);
+    border-radius: 2px;
+  }
+  .chevron { transition: transform var(--duration-fast) ease; }
+  .with-dropdown:hover .chevron { transform: rotate(180deg); }
+
+  .with-dropdown { position: relative; }
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    padding-top: 8px;
+    transform: translateX(-50%) translateY(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s var(--ease-out);
+    z-index: 100;
+  }
+  .with-dropdown:hover .dropdown {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateX(-50%) translateY(0);
+  }
+  .dropdown-inner {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 8px;
+    min-width: 300px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 0 0.5px var(--border);
+  }
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    transition: background var(--duration-fast) ease;
+    color: var(--ink);
+  }
+  .dropdown-item:hover { background: var(--signal-ghost); }
+  .dropdown-item strong { display: block; font-family: var(--font-ui); font-size: 14px; font-weight: 600; }
+  .dropdown-item span   { font-size: 12px; color: var(--ink-muted); }
+  .dropdown-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dropdown-arrow { margin-left: auto; color: var(--signal); opacity: 0; transition: opacity 0.2s, transform 0.2s; }
+  .dropdown-item:hover .dropdown-arrow { opacity: 1; transform: translateX(3px); }
+
+  .nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+
+  .lang-switch {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-muted);
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+  }
+  .lang-switch:hover {
+    color: var(--signal);
+    border-color: var(--signal);
+    background: var(--signal-ghost);
+  }
+
+  .nav-cta {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--signal);
+    color: var(--ink-inverse);
+    padding: 9px 20px;
+    border-radius: var(--pill-radius);
+    transition: background var(--duration-fast) ease, transform var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+    flex-shrink: 0;
+  }
+  .nav-cta:hover {
+    background: var(--signal-dim);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(254, 209, 44, 0.35);
+  }
+
+  @media (max-width: 1023px) {
+    .nav-links, .nav-cta { display: none; }
+  }
+</style>

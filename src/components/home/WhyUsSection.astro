@@ -1,0 +1,86 @@
+---
+import { reasons as localReasons } from '../../data/whyUs'
+
+interface Reason { icon: string; title: string; desc: string }
+interface WhyUsData {
+  tag?: string; title?: string; titleEm?: string; sub?: string; reasons?: Reason[]
+}
+interface Props { whyUs?: WhyUsData }
+
+const { whyUs } = Astro.props
+
+const tag     = whyUs?.tag     ?? 'Why Parcel'
+const title   = whyUs?.title   ?? 'NOT JUST'
+const titleEm = whyUs?.titleEm ?? 'DELIVERY.'
+const sub     = whyUs?.sub     ?? 'Six reasons why 500+ businesses trust Parcel to be the backbone of their operations.'
+const reasons = whyUs?.reasons?.length ? whyUs.reasons : localReasons
+---
+
+<section class="section section--navy why-section">
+  <div class="why-inner container">
+
+    <div class="why-header">
+      <span class="tag" data-reveal>{tag}</span>
+      <h2 class="section-title" data-reveal data-reveal-delay="80">
+        {title}<br/><em>{titleEm}</em>
+      </h2>
+      <p class="section-sub" data-reveal data-reveal-delay="160">{sub}</p>
+    </div>
+
+    <div class="why-grid">
+      {reasons.map((r, i) => (
+        <div class="why-card" data-reveal="scale" data-reveal-delay={String(i * 80)}>
+          <div class="why-icon">{r.icon}</div>
+          <h3 class="why-title">{r.title}</h3>
+          <p class="why-desc">{r.desc}</p>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .why-section { padding: var(--section-y) var(--section-x); }
+  .why-inner { max-width: var(--max-width); margin: 0 auto; }
+  .why-header { margin-bottom: 64px; }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .why-card {
+    background: var(--void);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--card-radius);
+    padding: 32px;
+    transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .why-card:hover {
+    border-color: var(--border);
+    transform: translateY(-4px);
+    box-shadow: 0 0 60px var(--signal-trace);
+  }
+
+  .why-icon { font-size: 28px; margin-bottom: 16px; }
+
+  .why-title {
+    font-family: var(--font-ui);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+
+  .why-desc {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--ink-muted);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 1023px) { .why-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 639px)  { .why-grid { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,163 @@
+---
+import { client as sanity } from '../../lib/sanity'
+import { ctaSectionQuery } from '../../lib/queries'
+
+const locale = Astro.currentLocale ?? 'en'
+const lang   = locale === 'ar' ? 'ar' : 'en'
+
+const fallback = {
+  en: {
+    tag:          'Ready to Ship?',
+    title:        'START MOVING',
+    titleEm:      'TODAY.',
+    sub:          "Join 500+ businesses across Bahrain and the GCC that trust Parcel to deliver their promises. Get a custom quote in under 24 hours.",
+    primaryLabel: 'Get a Free Quote →',
+    primaryHref:  '/contact',
+    ghostLabel:   'Track a Package',
+    ghostHref:    '/tracking',
+    footnote:     'No setup fees · No long-term contracts · Start same day',
+  },
+  ar: {
+    tag:          'مستعد للشحن؟',
+    title:        'ابدأ الحركة',
+    titleEm:      'اليوم.',
+    sub:          'انضم إلى أكثر من 500 شركة في البحرين والخليج تثق في بارسل لتوصيل وعودها. احصل على عرض سعر مخصص في أقل من 24 ساعة.',
+    primaryLabel: 'احصل على عرض سعر مجاني ←',
+    primaryHref:  '/ar/contact',
+    ghostLabel:   'تتبع طلبك',
+    ghostHref:    '/ar/tracking',
+    footnote:     'بدون رسوم إعداد · بدون عقود طويلة الأمد · ابدأ في نفس اليوم',
+  },
+}
+
+let cta = fallback[lang]
+
+const configured =
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID &&
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID !== 'your-project-id'
+
+if (configured) {
+  try {
+    const data = await sanity.fetch(ctaSectionQuery, { lang })
+    const c = data?.ctaSection
+    if (c?.tag) {
+      cta = {
+        tag:          c.tag          ?? cta.tag,
+        title:        c.title        ?? cta.title,
+        titleEm:      c.titleEm      ?? cta.titleEm,
+        sub:          c.sub          ?? cta.sub,
+        primaryLabel: c.primaryLabel ?? cta.primaryLabel,
+        primaryHref:  c.primaryHref  ?? cta.primaryHref,
+        ghostLabel:   c.ghostLabel   ?? cta.ghostLabel,
+        ghostHref:    c.ghostHref    ?? cta.ghostHref,
+        footnote:     c.footnote     ?? cta.footnote,
+      }
+    }
+  } catch { /* use fallback */ }
+}
+---
+
+<section class="cta-section" aria-label="Call to action">
+  <div class="cta-bg" aria-hidden="true">
+    <svg class="cta-lines" viewBox="0 0 1400 500" preserveAspectRatio="xMidYMid slice">
+      <path class="cta-line" d="M-100,400 C200,350 400,250 700,200 S1100,150 1500,100"/>
+      <path class="cta-line delay" d="M-100,450 C200,390 450,290 750,240 S1150,180 1500,140"/>
+      <circle r="3" fill="#fed12c" opacity="0.8">
+        <animateMotion dur="10s" repeatCount="indefinite" path="M-100,400 C200,350 400,250 700,200 S1100,150 1500,100"/>
+      </circle>
+    </svg>
+  </div>
+
+  <div class="cta-inner container">
+    <span class="tag" data-reveal>{cta.tag}</span>
+    <h2 class="cta-title" data-reveal data-reveal-delay="80">
+      {cta.title}<br/><em>{cta.titleEm}</em>
+    </h2>
+    <p class="cta-sub" data-reveal data-reveal-delay="160">{cta.sub}</p>
+    <div class="cta-actions" data-reveal data-reveal-delay="240">
+      <a href={cta.primaryHref} class="btn-primary" style="font-size: 16px; padding: 16px 44px;" data-cursor-expand>
+        {cta.primaryLabel}
+      </a>
+      <a href={cta.ghostHref} class="btn-ghost" style="font-size: 16px; padding: 15px 32px;" data-cursor-expand>
+        {cta.ghostLabel}
+      </a>
+    </div>
+    <p class="cta-footnote" data-reveal data-reveal-delay="320">{cta.footnote}</p>
+  </div>
+</section>
+
+<style>
+  .cta-section {
+    position: relative;
+    background: var(--navy);
+    padding: var(--section-y) var(--section-x);
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .cta-bg { position: absolute; inset: 0; pointer-events: none; opacity: 0.6; }
+
+  .cta-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  .cta-line {
+    fill: none;
+    stroke: var(--signal);
+    stroke-width: 1;
+    stroke-dasharray: 8 6;
+    opacity: 0.12;
+    animation: drawRoute 20s linear infinite;
+  }
+  .cta-line.delay { animation-delay: -8s; opacity: 0.07; }
+
+  .cta-inner {
+    max-width: 820px;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .cta-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(56px, 8vw, 104px);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+  .cta-title em { color: var(--signal); font-style: normal; display: block; }
+
+  .cta-sub {
+    font-size: clamp(15px, 1.2vw, 18px);
+    color: var(--ink-muted);
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 40px;
+  }
+
+  .cta-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cta-footnote {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--ink-faint);
+    margin-top: 24px;
+    letter-spacing: 0.02em;
+  }
+
+  @keyframes drawRoute {
+    from { stroke-dashoffset: 1000; }
+    to   { stroke-dashoffset: -1000; }
+  }
+</style>

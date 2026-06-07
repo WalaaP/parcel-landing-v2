@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Walaa/.claude/projects/c--Users-Walaa-OneDrive-Desktop-Projects-landing-astro/memory/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Walaa\\.claude\\projects\\c--Users-Walaa-OneDrive-Desktop-Projects-landing-astro\\memory"
+    ]
+  }
+}

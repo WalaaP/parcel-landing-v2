@@ -1,0 +1,206 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import PageHero from '../components/shared/PageHero.astro'
+import TestimonialCard from '../components/shared/TestimonialCard.astro'
+import { clients as localClients, type Client } from '../data/clients'
+import { testimonials as localTestimonials, type Testimonial } from '../data/testimonials'
+import CtaSection from '../components/home/CtaSection.astro'
+import { client as sanity } from '../lib/sanity'
+import { testimonialsQuery, clientsQuery } from '../lib/queries'
+
+let clients: Client[] = localClients
+let testimonials: Testimonial[] = localTestimonials
+
+const sanityConfigured =
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID &&
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID !== 'your-project-id'
+
+if (sanityConfigured) {
+  try {
+    const [rawClients, rawTestimonials] = await Promise.all([
+      sanity.fetch(clientsQuery),
+      sanity.fetch(testimonialsQuery),
+    ])
+
+    if (rawClients?.length) {
+      clients = rawClients.map((c: any) => ({
+        name:     c.name,
+        industry: c.industry ?? '',
+        initials: c.initials ?? c.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
+        color:    c.color ?? '#fed12c',
+        logo:     c.logo?.asset?.url,
+      }))
+    }
+
+    if (rawTestimonials?.length) {
+      testimonials = rawTestimonials.map((t: any) => ({
+        quote:    t.quote,
+        name:     t.name,
+        role:     t.role ?? '',
+        company:  t.company ?? '',
+        initials: t.initials ?? t.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
+        rating:   t.rating ?? 5,
+        avatar:   t.avatar?.asset?.url,
+      }))
+    }
+  } catch {
+    // Sanity unavailable — fall through to local data
+  }
+}
+---
+
+<BaseLayout
+  title="Our Clients"
+  description="500+ businesses across Bahrain and the GCC trust Parcel. Read their stories and see how Parcel has transformed their delivery operations."
+>
+  <PageHero
+    tag="Client Stories"
+    title="BUSINESSES THAT"
+    titleEm="TRUST PARCEL."
+    sub="From Bahraini startups to GCC enterprises — 500+ businesses ship with Parcel. Here's what they say."
+    centered
+  />
+
+  <section class="section section--dark">
+    <div class="container" style="max-width: var(--max-width); padding: var(--section-y) var(--section-x);">
+      <div class="clients-logo-grid" aria-label="Our clients">
+        {clients.map((client, i) => (
+          <div class="client-logo-item" data-reveal="scale" data-reveal-delay={String(i * 50)}>
+            <div class="client-logo-avatar" style={`background: ${client.color}22; border: 1px solid ${client.color}33`}>
+              <span style={`color: ${client.color}`}>{client.initials}</span>
+            </div>
+            <div>
+              <strong>{client.name}</strong>
+              <span>{client.industry}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--navy">
+    <div class="container" style="max-width: var(--max-width); padding: var(--section-y) var(--section-x);">
+      <h2 class="section-title" data-reveal>WHAT THEY <em>SAY.</em></h2>
+      <div class="testimonials-grid" style="margin-top: 56px;">
+        {testimonials.map((t, i) => (
+          <div data-reveal="scale" data-reveal-delay={String(i * 80)}>
+            <TestimonialCard
+              quote={t.quote}
+              name={t.name}
+              role={t.role}
+              company={t.company}
+              initials={t.initials}
+              rating={t.rating}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--dark trust-section">
+    <div class="container" style="max-width: var(--max-width); padding: var(--section-y) var(--section-x); text-align: center;">
+      <h2 class="section-title" data-reveal>THE NUMBERS <em>SPEAK.</em></h2>
+      <div class="trust-stats">
+        {[
+          ['500+', 'Active businesses'],
+          ['2M+', 'Deliveries completed'],
+          ['98.7%', 'On-time rate'],
+          ['6', 'Years serving Bahrain'],
+        ].map(([num, label], i) => (
+          <div class="trust-stat" data-reveal="scale" data-reveal-delay={String(i * 80)}>
+            <div class="trust-num">{num}</div>
+            <div class="trust-label">{label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaSection />
+</BaseLayout>
+
+<style>
+  .clients-logo-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+  }
+
+  .client-logo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--navy);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 14px;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+  .client-logo-item:hover { border-color: var(--border); transform: translateY(-2px); }
+
+  .client-logo-avatar {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .client-logo-avatar span {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .client-logo-item strong {
+    display: block;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .client-logo-item span {
+    font-size: 11px;
+    color: var(--ink-faint);
+    display: block;
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .trust-stats {
+    display: flex;
+    justify-content: center;
+    gap: 80px;
+    margin-top: 64px;
+    flex-wrap: wrap;
+  }
+
+  .trust-num {
+    font-family: var(--font-display);
+    font-size: clamp(56px, 7vw, 88px);
+    font-weight: 900;
+    color: var(--signal);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .trust-label {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 1279px) { .clients-logo-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (max-width: 1023px) { .clients-logo-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 767px) {
+    .clients-logo-grid { grid-template-columns: repeat(2, 1fr); }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .trust-stats { gap: 40px; }
+  }
+</style>

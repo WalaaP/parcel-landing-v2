@@ -1,0 +1,12 @@
+---
+interface Props {
+  label: string
+  icon?: string
+}
+const { label, icon } = Astro.props
+---
+
+<span class="tag">
+  {icon && <span aria-hidden="true">{icon}</span>}
+  {label}
+</span>

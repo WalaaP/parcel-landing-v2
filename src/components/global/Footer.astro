@@ -1,0 +1,256 @@
+---
+import { client as sanity } from '../../lib/sanity'
+import { footerQuery } from '../../lib/queries'
+
+const locale = Astro.currentLocale ?? 'en'
+const lang   = locale === 'ar' ? 'ar' : 'en'
+const isAr   = lang === 'ar'
+const year   = new Date().getFullYear()
+
+const fallback = {
+  en: {
+    tagline:         "Bahrain's most intelligent delivery network. Moving faster, smarter, and more beautifully than anyone else in the GCC.",
+    operatingHours:  'Operating — Sun–Thu, AST (UTC+3)',
+    copyrightSuffix: 'Parcel Logistics W.L.L. — Seef District, Manama, Kingdom of Bahrain',
+    builtFor:        'Built for speed.',
+    email:           'hello@parcel.bh',
+    phone:           '+973 1700 0000',
+  },
+  ar: {
+    tagline:         'شبكة التوصيل الأكثر ذكاءً في البحرين. نتحرك بشكل أسرع وأذكى وأجمل من أي شركة أخرى في الخليج.',
+    operatingHours:  'نعمل — الأحد–الخميس، توقيت السعودية (UTC+3)',
+    copyrightSuffix: 'بارسل للوجستيات ذ.م.م — حي السيف، المنامة، مملكة البحرين',
+    builtFor:        'مبني للسرعة.',
+    email:           'hello@parcel.bh',
+    phone:           '+973 1700 0000',
+  },
+}
+
+let f = fallback[lang]
+
+const configured =
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID &&
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID !== 'your-project-id'
+
+if (configured) {
+  try {
+    const data = await sanity.fetch(footerQuery, { lang })
+    if (data?.footer?.tagline) {
+      f = {
+        tagline:         data.footer.tagline         ?? f.tagline,
+        operatingHours:  data.footer.operatingHours  ?? f.operatingHours,
+        copyrightSuffix: data.footer.copyrightSuffix ?? f.copyrightSuffix,
+        builtFor:        data.footer.builtFor        ?? f.builtFor,
+        email:           data.email                  ?? f.email,
+        phone:           data.phone                  ?? f.phone,
+      }
+    }
+  } catch { /* use fallback */ }
+}
+
+const prefix = isAr ? '/ar' : ''
+
+const footerLinks = isAr
+  ? {
+      'الخدمات': [
+        { label: 'توصيل فوري',      href: `${prefix}/services#instant` },
+        { label: 'نفس اليوم',       href: `${prefix}/services#sameday` },
+        { label: 'اليوم التالي',     href: `${prefix}/services#nextday` },
+        { label: 'التجارة الإلكترونية', href: `${prefix}/ecommerce` },
+      ],
+      'الشركة': [
+        { label: 'عن بارسل',  href: `${prefix}/#about` },
+        { label: 'عملاؤنا',   href: `${prefix}/clients` },
+        { label: 'المدونة',    href: `${prefix}/blog` },
+        { label: 'تواصل معنا', href: `${prefix}/contact` },
+      ],
+      'التكنولوجيا': [
+        { label: 'التتبع المباشر',  href: `${prefix}/tracking` },
+        { label: 'واجهة API',       href: `${prefix}/ecommerce#api` },
+        { label: 'التكاملات',       href: `${prefix}/ecommerce#integrations` },
+      ],
+      'قانوني': [
+        { label: 'سياسة الخصوصية', href: `${prefix}/privacy` },
+        { label: 'شروط الخدمة',    href: `${prefix}/terms` },
+        { label: 'سياسة الكوكيز',  href: `${prefix}/cookies` },
+      ],
+    }
+  : {
+      Services: [
+        { label: 'Instant Delivery', href: '/services#instant' },
+        { label: 'Same Day',         href: '/services#sameday' },
+        { label: 'Next Day',         href: '/services#nextday' },
+        { label: 'E-Commerce',       href: '/ecommerce' },
+      ],
+      Company: [
+        { label: 'About Parcel', href: '/#about' },
+        { label: 'Clients',      href: '/clients' },
+        { label: 'Blog',         href: '/blog' },
+        { label: 'Contact',      href: '/contact' },
+      ],
+      Technology: [
+        { label: 'Live Tracking', href: '/tracking' },
+        { label: 'Merchant API',  href: '/ecommerce#api' },
+        { label: 'Integrations',  href: '/ecommerce#integrations' },
+      ],
+      Legal: [
+        { label: 'Privacy Policy',   href: '/privacy' },
+        { label: 'Terms of Service', href: '/terms' },
+        { label: 'Cookie Policy',    href: '/cookies' },
+      ],
+    }
+---
+
+<footer class="footer" role="contentinfo">
+  <div class="footer-inner">
+
+    <div class="footer-brand">
+      <a href={isAr ? '/ar' : '/'} class="footer-logo" aria-label="Parcel homepage">
+        <svg class="logo-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect x="2" y="2" width="28" height="28" rx="6" fill="var(--signal)" opacity="0.12"/>
+          <path d="M10 8h8a6 6 0 010 12h-4v4H10V8z" fill="var(--signal)"/>
+        </svg>
+        <span><em>Par</em>cel</span>
+      </a>
+      <p class="footer-tagline">{f.tagline}</p>
+      <div class="footer-contact">
+        <a href={`mailto:${f.email}`} class="contact-link">{f.email}</a>
+        <a href={`tel:${f.phone.replace(/\s/g, '')}`} class="contact-link">{f.phone}</a>
+      </div>
+      <div class="footer-badge">
+        <span class="live-dot"></span>
+        <span>{f.operatingHours}</span>
+      </div>
+    </div>
+
+    {Object.entries(footerLinks).map(([group, links]) => (
+      <div class="footer-col">
+        <h4 class="footer-heading">{group}</h4>
+        <ul role="list">
+          {links.map(link => (
+            <li><a href={link.href} class="footer-link">{link.label}</a></li>
+          ))}
+        </ul>
+      </div>
+    ))}
+
+  </div>
+
+  <div class="footer-bottom">
+    <p>© {year} {f.copyrightSuffix}</p>
+    <p class="footer-made">{f.builtFor}</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--navy);
+    border-top: 1px solid var(--border);
+    padding: var(--section-y) var(--section-x) 40px;
+  }
+
+  .footer-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 60px;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+  }
+  .footer-logo em { color: var(--signal); font-style: normal; }
+  .logo-icon { width: 28px; height: 28px; }
+
+  .footer-tagline {
+    font-size: 14px;
+    color: var(--ink-muted);
+    line-height: 1.7;
+    margin-bottom: 24px;
+    max-width: 300px;
+  }
+
+  .footer-contact { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+
+  .contact-link {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    transition: color 0.2s ease;
+  }
+  .contact-link:hover { color: var(--signal); }
+
+  .footer-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  .footer-col { display: flex; flex-direction: column; }
+
+  .footer-heading {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--signal);
+    margin-bottom: 20px;
+  }
+
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+  .footer-link {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    color: var(--ink-muted);
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+  }
+  .footer-link:hover { color: var(--ink); transform: translateX(3px); }
+
+  .footer-bottom {
+    max-width: var(--max-width);
+    margin: 60px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+    font-family: var(--font-ui);
+  }
+
+  .footer-made {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--signal);
+    font-size: 11px;
+  }
+
+  @media (max-width: 1023px) {
+    .footer-inner { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .footer-brand { grid-column: 1 / -1; }
+  }
+
+  @media (max-width: 639px) {
+    .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+  }
+</style>

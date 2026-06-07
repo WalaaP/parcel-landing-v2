@@ -1,0 +1,77 @@
+/* ── SCROLL REVEAL ──────────────────────────────────── */
+[data-reveal]              { opacity: 0; transform: translateY(40px);   transition: opacity 0.75s var(--ease-out), transform 0.75s var(--ease-out); }
+[data-reveal="left"]       { opacity: 0; transform: translateX(-50px);  transition: opacity 0.75s var(--ease-out), transform 0.75s var(--ease-out); }
+[data-reveal="right"]      { opacity: 0; transform: translateX(50px);   transition: opacity 0.75s var(--ease-out), transform 0.75s var(--ease-out); }
+[data-reveal="scale"]      { opacity: 0; transform: scale(0.86);        transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out); }
+[data-reveal="blur"]       { opacity: 0; filter: blur(12px);            transition: opacity 0.8s ease, filter 0.8s ease; }
+[data-reveal].revealed     { opacity: 1; transform: none; filter: none; }
+
+/* ── TICKER ─────────────────────────────────────────── */
+.ticker-bar {
+  position: relative;
+  z-index: 10;
+  background: var(--signal);
+  color: var(--ink-inverse);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  overflow: hidden;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  margin-top: 72px;
+}
+.ticker-inner {
+  display: flex;
+  gap: 64px;
+  white-space: nowrap;
+  animation: ticker 40s linear infinite;
+}
+.ticker-item { flex-shrink: 0; }
+
+/* ── SECTION DIVIDER SCANLINE ───────────────────────── */
+@keyframes scanline {
+  from { left: -20%; }
+  to   { left: 120%; }
+}
+
+/* ── GENERAL KEYFRAMES ──────────────────────────────── */
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33.333%); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  from { background-position: -400px 0; }
+  to   { background-position: 400px 0; }
+}
+
+/* ── SKELETON LOADER ────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--navy) 25%, var(--navy-mid) 50%, var(--navy) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}

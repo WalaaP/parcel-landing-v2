@@ -1,0 +1,114 @@
+---
+import Navbar         from '../components/global/Navbar.astro'
+import Footer         from '../components/global/Footer.astro'
+import Cursor         from '../components/react/Cursor.tsx'
+import ScrollProgress from '../components/react/ScrollProgress.tsx'
+import '../styles/global.css'
+import '../styles/animations.css'
+
+interface Props {
+  title:        string
+  description?: string
+  ogImage?:     string
+  noIndex?:     boolean
+}
+
+const {
+  title,
+  description = "Parcel — Bahrain's most advanced delivery network. Real-time tracking, instant to next-day delivery, and e-commerce fulfillment across the GCC.",
+  ogImage  = '/og-default.jpg',
+  noIndex  = false,
+} = Astro.props
+
+const locale    = Astro.currentLocale || 'en'
+const isArabic  = locale === 'ar'
+const canonical = new URL(Astro.url.pathname, 'https://parcel.bh').href
+---
+
+<!DOCTYPE html>
+<html lang={locale} dir={isArabic ? 'rtl' : 'ltr'}>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"         content={description} />
+  <meta property="og:type"         content="website" />
+  <meta property="og:title"        content={`${title} | Parcel`} />
+  <meta property="og:description"  content={description} />
+  <meta property="og:image"        content={ogImage} />
+  <meta property="og:url"          content={canonical} />
+  <meta property="og:locale"       content={isArabic ? 'ar_BH' : 'en_BH'} />
+  <meta property="og:site_name"    content="Parcel" />
+  <meta name="twitter:card"        content="summary_large_image" />
+  {noIndex && <meta name="robots" content="noindex" />}
+  <link rel="canonical" href={canonical} />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- Arabic font (Cairo) — loaded only when needed -->
+  {isArabic && (
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"
+    />
+  )}
+
+  <title>{title} | Parcel</title>
+</head>
+<body>
+  <Cursor         client:load />
+  <ScrollProgress client:load />
+
+  <Navbar />
+
+  <main id="main-content">
+    <slot />
+  </main>
+
+  <Footer />
+
+  <script>
+    // Scroll Reveal
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return
+        const el    = entry.target as HTMLElement
+        const delay = parseInt(el.dataset.revealDelay || '0')
+        setTimeout(() => el.classList.add('revealed'), delay)
+        io.unobserve(el)
+      })
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' })
+    document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el))
+
+    // Navbar scroll state
+    const nav = document.getElementById('navbar')
+    let lastScroll = 0
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY
+      nav?.classList.toggle('scrolled', y > 60)
+      nav?.classList.toggle('hidden',   y > 300 && y > lastScroll)
+      lastScroll = y
+    }, { passive: true })
+  </script>
+
+  {isArabic && (
+    <style>
+      /* Arabic font override */
+      body, button, input, select, textarea {
+        font-family: 'Cairo', 'Segoe UI', sans-serif;
+      }
+      /* RTL logical spacing fixes */
+      .hero-content { text-align: right; }
+      .hero-actions  { flex-direction: row-reverse; }
+      .hero-eyebrow  { flex-direction: row-reverse; }
+      .stat-item { border-right: none; border-left: 1px solid rgba(255,255,255,0.05); }
+      .stat-item:last-child { border-left: none; }
+      .dropdown { left: auto; right: 50%; transform: translateX(50%) translateY(6px); }
+      .with-dropdown:hover .dropdown { transform: translateX(50%) translateY(0); }
+      .nav-links { flex-direction: row-reverse; }
+      .dropdown-arrow { margin-left: 0; margin-right: auto; }
+      .dropdown-item:hover .dropdown-arrow { transform: translateX(-3px); }
+      /* Fix ticker direction */
+      .ticker-inner { animation-direction: reverse; }
+    </style>
+  )}
+</body>
+</html>

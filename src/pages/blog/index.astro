@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageHero from '../../components/shared/PageHero.astro'
+import BlogFilter from '../../components/react/BlogFilter.tsx'
+
+// Try to fetch from Sanity, fall back to empty array
+let posts: any[] = []
+try {
+  const { client } = await import('../../lib/sanity')
+  const { postsQuery } = await import('../../lib/queries')
+  posts = await client.fetch(postsQuery)
+} catch {
+  // Sanity not configured yet — show empty state
+  posts = []
+}
+---
+
+<BaseLayout
+  title="Blog"
+  description="Insights on logistics, e-commerce, and the future of delivery in Bahrain and the GCC — from the team at Parcel."
+>
+  <PageHero
+    tag="Parcel Blog"
+    title="INSIGHTS &"
+    titleEm="INTELLIGENCE."
+    sub="Logistics trends, technology updates, and stories from 6 years of building the future of delivery in Bahrain."
+    centered
+  />
+
+  <section class="blog-list-section section section--dark">
+    <div class="container" style="max-width: var(--max-width); padding: 0 var(--section-x) var(--section-y);">
+      {posts.length > 0 ? (
+        <BlogFilter posts={posts} client:visible />
+      ) : (
+        <div class="blog-empty">
+          <span class="empty-icon">📝</span>
+          <h2>Stories incoming.</h2>
+          <p>We're working on our first articles. Check back soon.</p>
+          <a href="/contact" class="btn-primary" style="margin-top: 24px;">Contact Us →</a>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-list-section { padding-top: 0; }
+
+  .blog-empty {
+    text-align: center;
+    padding: 80px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .empty-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+
+  .blog-empty h2 {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .blog-empty p { color: var(--ink-muted); font-size: 16px; }
+</style>

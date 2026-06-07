@@ -1,0 +1,197 @@
+---
+import BaseLayout from './BaseLayout.astro'
+import ReadingProgress from '../components/react/ReadingProgress.tsx'
+
+interface Props {
+  title:       string
+  description?: string
+  publishedAt?: string
+  author?:     string
+  category?:   string
+  ogImage?:    string
+}
+
+const { title, description, publishedAt, author, category, ogImage } = Astro.props
+
+const formattedDate = publishedAt
+  ? new Date(publishedAt).toLocaleDateString('en-BH', { year: 'numeric', month: 'long', day: 'numeric' })
+  : undefined
+---
+
+<BaseLayout title={title} description={description} ogImage={ogImage}>
+  <ReadingProgress client:load />
+
+  <article class="post-article">
+    <div class="post-hero">
+      <div class="post-meta-top">
+        {category && <span class="post-category">{category}</span>}
+        {formattedDate && <time datetime={publishedAt}>{formattedDate}</time>}
+      </div>
+      <h1 class="post-title">{title}</h1>
+      {description && <p class="post-excerpt">{description}</p>}
+      {author && (
+        <div class="post-author">
+          <div class="author-avatar">{author.charAt(0)}</div>
+          <span>{author}</span>
+        </div>
+      )}
+    </div>
+
+    <div class="post-content">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post-article {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 var(--section-x) var(--section-y);
+  }
+
+  .post-hero {
+    padding: 120px 0 60px;
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: 60px;
+  }
+
+  .post-meta-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+
+  .post-category {
+    background: var(--signal);
+    color: var(--ink-inverse);
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: var(--pill-radius);
+  }
+
+  .post-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 58px);
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--ink);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+
+  .post-excerpt {
+    font-size: clamp(16px, 1.2vw, 18px);
+    color: var(--ink-muted);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .post-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-muted);
+  }
+
+  .author-avatar {
+    width: 32px; height: 32px;
+    background: var(--signal);
+    color: var(--ink-inverse);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 14px;
+  }
+
+  .post-content {
+    font-family: var(--font-body);
+    font-size: clamp(15px, 1.1vw, 17px);
+    line-height: 1.85;
+    color: var(--ink-muted);
+  }
+
+  .post-content :global(h2) {
+    font-family: var(--font-display);
+    font-size: clamp(26px, 3vw, 36px);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin: 48px 0 16px;
+  }
+
+  .post-content :global(h3) {
+    font-family: var(--font-ui);
+    font-size: clamp(18px, 2vw, 22px);
+    font-weight: 600;
+    color: var(--ink);
+    margin: 32px 0 12px;
+  }
+
+  .post-content :global(p) {
+    margin-bottom: 20px;
+  }
+
+  .post-content :global(a) {
+    color: var(--signal);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .post-content :global(blockquote) {
+    border-left: 3px solid var(--signal);
+    padding: 12px 20px;
+    margin: 28px 0;
+    background: var(--signal-ghost);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  .post-content :global(code) {
+    font-family: monospace;
+    background: var(--navy);
+    color: var(--signal);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  .post-content :global(pre) {
+    background: var(--navy);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 24px 0;
+  }
+
+  .post-content :global(ul), .post-content :global(ol) {
+    padding-left: 24px;
+    margin-bottom: 20px;
+  }
+
+  .post-content :global(li) { margin-bottom: 6px; }
+
+  .post-content :global(img) {
+    border-radius: 12px;
+    margin: 28px 0;
+    width: 100%;
+    border: 1px solid var(--border-subtle);
+  }
+</style>

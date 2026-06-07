@@ -1,0 +1,149 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageHero from '../../components/shared/PageHero.astro'
+import CtaSection from '../../components/home/CtaSection.astro'
+import FaqAccordion from '../../components/react/FaqAccordion.tsx'
+import { client as sanity } from '../../lib/sanity'
+import { siteSettingsQuery } from '../../lib/queries'
+
+const localIntegrations = [
+  { icon: '🛍️', name: 'Shopify',      desc: 'تزامن تلقائي للطلبات وإرسال فوري مع تتبع مدمج.' },
+  { icon: '🏪', name: 'Salla',         desc: 'تكامل أصلي مع أكبر منصة تجارة في السعودية والخليج.' },
+  { icon: '🌐', name: 'WooCommerce',   desc: 'إضافة WordPress — تثبيت في دقيقة، إرسال تلقائي.' },
+  { icon: '⚡', name: 'Zid',           desc: 'مزامنة مباشرة مع متجرك وإدارة الإرجاعات.' },
+  { icon: '🔗', name: 'REST API',      desc: 'REST API كاملة الوثائق مع webhooks لكل تغيير في الحالة.' },
+  { icon: '📦', name: 'OpenCart',      desc: 'دعم متكامل مع إدارة مخزون وتتبع فوري.' },
+]
+
+const localApiFeatures = [
+  'إنشاء طلبات برمجياً بسطر واحد',
+  'Webhooks فوري لكل تغيير في الحالة',
+  'نقاط نهاية لإدارة الاستلام والمستودعات',
+  'مصادقة OAuth 2.0 مع مفاتيح API',
+  'حد طلبات 1000 في الدقيقة مع دعم الدُفعات',
+]
+
+const localFaqs = [
+  { question: 'كم يستغرق ربط متجري بـ بارسل؟', answer: 'الربط مع Shopify وSalla يستغرق أقل من دقيقتين — تثبيت التطبيق، ربط حسابك، جاهز. التكامل المخصص عبر API يستغرق عادةً أقل من يوم عمل.' },
+  { question: 'هل تتزامن الطلبات تلقائياً؟', answer: 'نعم. بمجرد الربط، تُرسَل كل طلبات متجرك تلقائياً إلى بارسل ويُرسَل ساعٍ فوراً. لا حاجة لأي إجراء يدوي.' },
+  { question: 'كيف تتم معالجة الإرجاعات؟', answer: 'يدعم بارسل التوصيل العكسي مع إثبات استلام رقمي. يمكن إنشاء الإرجاعات عبر لوحة التحكم أو API وتُتابع بنفس مستوى التتبع.' },
+  { question: 'هل يدعم API نقاط الاستلام المتعددة؟', answer: 'نعم. يمكنك تكوين مستودعات متعددة وقواعد توجيه ذكية تُوزِّع الطلبات تلقائياً بناءً على المخزون والقرب الجغرافي.' },
+]
+
+let integrations = localIntegrations
+let apiFeatures  = localApiFeatures
+let faqs         = localFaqs
+
+const configured =
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID &&
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID !== 'your-project-id'
+
+if (configured) {
+  try {
+    const settings = await sanity.fetch(siteSettingsQuery, { lang: 'ar' })
+    if (settings?.ecommerceIntegrations?.length) integrations = settings.ecommerceIntegrations
+    if (settings?.ecommerceApiFeatures?.length)  apiFeatures  = settings.ecommerceApiFeatures
+    if (settings?.ecommerceFaqs?.length)         faqs         = settings.ecommerceFaqs
+  } catch { /* use local data */ }
+}
+---
+
+<BaseLayout
+  title="تلبية طلبات التجارة الإلكترونية"
+  description="بارسل يتكامل مباشرة مع Shopify وSalla وWooCommerce وغيرها. أتمت عمليات توصيلك ودع بارسل يتولى التلبية بينما تنمو أعمالك."
+>
+  <PageHero
+    tag="تلبية طلبات التجارة الإلكترونية"
+    title="أتمت"
+    titleEm="التلبية."
+    sub="ارتبط بمتجرك في دقائق. الطلبات تتزامن تلقائياً، الساعون يُرسَلون فوراً، وعملاؤك يحصلون على تتبع مباشر — دون أي تدخل منك."
+    cta={{ label: 'ارتبط بمتجرك', href: '/ar/contact' }}
+    ctaGhost={{ label: 'وثائق API', href: '/ar/contact' }}
+  />
+
+  <section class="section section--dark" id="integrations">
+    <div class="container" style="max-width: var(--max-width); margin: 0 auto; padding: var(--section-y) var(--section-x);">
+      <span class="tag" data-reveal>التكاملات</span>
+      <h2 class="section-title" data-reveal data-reveal-delay="80">ارتبط بأي <em>منصة.</em></h2>
+      <div class="integrations-grid">
+        {integrations.map((int, i) => (
+          <div class="int-card" data-reveal="scale" data-reveal-delay={String(i * 60)}>
+            <span class="int-icon">{int.icon}</span>
+            <h3>{int.name}</h3>
+            <p>{int.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--navy" id="api">
+    <div class="api-inner container">
+      <div class="api-copy">
+        <span class="tag" data-reveal>API للمطورين</span>
+        <h2 class="section-title" data-reveal data-reveal-delay="80">مبني <em>للمطورين.</em></h2>
+        <p class="section-sub" data-reveal data-reveal-delay="160">
+          REST API الخاصة بنا تمنحك تحكماً كاملاً. أنشئ طلبات، تتبع الشحنات، أدر الاستلام،
+          واستقبل webhooks لكل تغيير في الحالة. وثائق كاملة متاحة.
+        </p>
+        <div class="api-features" data-reveal data-reveal-delay="240">
+          {apiFeatures.map((f: string) => (
+            <div class="api-feature">
+              <span style="color: var(--signal)">✓</span>
+              {f}
+            </div>
+          ))}
+        </div>
+        <a href="/ar/contact" class="btn-primary" style="margin-top: 28px;" data-cursor-expand>اطلب الوصول إلى API ←</a>
+      </div>
+      <div class="api-code" data-reveal="right" data-reveal-delay="200">
+        <div class="code-block">
+          <div class="code-header">
+            <span>POST /v1/orders</span>
+            <span class="code-badge">REST API</span>
+          </div>
+          <pre><code>{`{
+  "pickup": {
+    "address": "حي السيف، المنامة",
+    "contact": "+973 1700 0000"
+  },
+  "dropoff": {
+    "address": "الجفير، المنامة",
+    "contact": "+973 XXXX XXXX"
+  },
+  "tier": "sameday",
+  "cod_amount": 12.500
+}`}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--dark">
+    <div class="container" style="max-width: 800px; padding: var(--section-y) var(--section-x);">
+      <span class="tag" data-reveal>الأسئلة الشائعة</span>
+      <h2 class="section-title" data-reveal data-reveal-delay="80">أسئلة التجارة الإلكترونية <em>الشائعة.</em></h2>
+      <div style="margin-top: 48px;"><FaqAccordion items={faqs} client:visible /></div>
+    </div>
+  </section>
+
+  <CtaSection />
+</BaseLayout>
+
+<style>
+  .integrations-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 56px; }
+  .int-card { background: var(--navy); border: 1px solid var(--border-subtle); border-radius: var(--card-radius); padding: 28px; transition: border-color 0.3s ease, transform 0.3s ease; }
+  .int-card:hover { border-color: var(--border); transform: translateY(-4px); }
+  .int-icon { font-size: 32px; display: block; margin-bottom: 14px; }
+  .int-card h3 { font-family: var(--font-ui); font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .int-card p  { font-size: 14px; color: var(--ink-muted); }
+  .api-inner { max-width: var(--max-width); margin: 0 auto; padding: var(--section-y) var(--section-x); display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .api-features { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
+  .api-feature { display: flex; gap: 10px; font-family: var(--font-ui); font-size: 14px; color: var(--ink-muted); }
+  .code-block { background: var(--navy); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; font-family: monospace; }
+  .code-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: var(--navy-mid); border-bottom: 1px solid var(--border-subtle); font-size: 13px; color: var(--signal); font-weight: 600; }
+  .code-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); background: var(--void); padding: 3px 8px; border-radius: 4px; }
+  code { display: block; padding: 20px; font-size: 13px; color: var(--ink-muted); line-height: 1.8; white-space: pre; }
+  @media (max-width: 1023px) { .api-inner { grid-template-columns: 1fr; } .integrations-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 639px)  { .integrations-grid { grid-template-columns: 1fr; } }
+</style>

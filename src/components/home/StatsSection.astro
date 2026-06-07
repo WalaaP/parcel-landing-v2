@@ -1,0 +1,29 @@
+---
+import StatsCounter from '../react/StatsCounter.tsx'
+import type { Stat } from '../../data/stats'
+
+interface Props {
+  stats?: Stat[]
+}
+
+const { stats } = Astro.props
+---
+
+<section class="stats-section" aria-label="Company statistics">
+  <div class="stats-inner">
+    <StatsCounter stats={stats} client:visible />
+  </div>
+</section>
+
+<style>
+  .stats-section {
+    background: var(--navy);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 56px var(--section-x);
+  }
+  .stats-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+</style>

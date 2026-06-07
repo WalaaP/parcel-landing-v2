@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import PageHero from '../components/shared/PageHero.astro'
+import TrackingWidget from '../components/react/TrackingWidget.tsx'
+import CtaSection from '../components/home/CtaSection.astro'
+import { client as sanity } from '../lib/sanity'
+import { siteSettingsQuery } from '../lib/queries'
+
+const localFeatures = [
+  { icon: '📱', title: 'Share Live Link',     desc: 'Send customers a live tracking link. No account needed — they see real-time position on a map.' },
+  { icon: '🔔', title: 'Automatic Alerts',    desc: 'SMS and email notifications at every stage: picked up, in transit, out for delivery, delivered.' },
+  { icon: '📍', title: '30-Second Updates',   desc: 'Courier GPS position refreshes every 30 seconds. Your ETA recalculates dynamically with traffic.' },
+  { icon: '📷', title: 'Proof of Delivery',   desc: 'Photo, GPS coordinates, and timestamp captured at the moment of handoff. Stored in your dashboard.' },
+]
+
+let features     = localFeatures
+let widgetLabels = { placeholder: undefined as string | undefined, trackBtn: undefined as string | undefined, notFoundMsg: undefined as string | undefined }
+
+const configured =
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID &&
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID !== 'your-project-id'
+
+if (configured) {
+  try {
+    const settings = await sanity.fetch(siteSettingsQuery, { lang: 'en' })
+    if (settings?.trackingFeatures?.length) features = settings.trackingFeatures
+    if (settings?.trackingWidget) widgetLabels = settings.trackingWidget
+  } catch { /* use local data */ }
+}
+---
+
+<BaseLayout
+  title="Track Your Parcel"
+  description="Track any Parcel delivery in real time. Enter your order ID to see live GPS updates, delivery status, and estimated arrival time."
+>
+  <PageHero
+    tag="Live Tracking"
+    title="WHERE IS"
+    titleEm="YOUR PACKAGE?"
+    sub="Real-time GPS tracking on every single order. Enter your order ID to see exactly where your parcel is right now."
+    centered
+  />
+
+  <section class="tracking-section section section--navy">
+    <div class="tracking-wrap container">
+      <TrackingWidget placeholder={widgetLabels.placeholder} trackBtn={widgetLabels.trackBtn} notFoundMsg={widgetLabels.notFoundMsg} client:visible />
+    </div>
+  </section>
+
+  <section class="tracking-info section section--dark">
+    <div class="info-inner container">
+      <h2 class="section-title" data-reveal>HOW TRACKING <em>WORKS.</em></h2>
+      <div class="info-grid">
+        {features.map((item, i) => (
+          <div class="info-card" data-reveal="scale" data-reveal-delay={String(i * 80)}>
+            <span class="info-icon">{item.icon}</span>
+            <h3>{item.title}</h3>
+            <p>{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaSection />
+</BaseLayout>
+
+<style>
+  .tracking-section { padding: var(--section-y) var(--section-x); }
+  .tracking-wrap { max-width: 760px; margin: 0 auto; }
+  .tracking-info { padding: var(--section-y) var(--section-x); }
+  .info-inner { max-width: var(--max-width); margin: 0 auto; }
+  .info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 56px; }
+  .info-card { background: var(--navy); border: 1px solid var(--border-subtle); border-radius: var(--card-radius); padding: 28px; transition: border-color 0.3s ease, transform 0.3s ease; }
+  .info-card:hover { border-color: var(--border); transform: translateY(-4px); }
+  .info-icon { font-size: 28px; display: block; margin-bottom: 14px; }
+  .info-card h3 { font-family: var(--font-ui); font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .info-card p  { font-size: 14px; color: var(--ink-muted); line-height: 1.65; }
+  @media (max-width: 1023px) { .info-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 639px)  { .info-grid { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,133 @@
+---
+import { techFeatures } from '../../data/techFeatures'
+
+interface TechFeature { icon: string; title: string; desc: string }
+interface TechSectionData {
+  tag?: string; title?: string; titleEm?: string; sub?: string
+  features?: TechFeature[]
+  mockupLabelLive?: string; mockupLabelEta?: string
+  mockupTimeline?: { label: string }[]
+}
+interface Props { techSection?: TechSectionData }
+
+const { techSection } = Astro.props
+
+const tag     = techSection?.tag     ?? 'Powered by Technology'
+const title   = techSection?.title   ?? 'TRACK EVERY'
+const titleEm = techSection?.titleEm ?? 'SIGNAL.'
+const sub     = techSection?.sub     ?? 'From the moment a package is collected to the second it lands at the door — every movement is tracked, analyzed, and optimized in real time. Merchants see everything. Recipients are always informed.'
+const features = techSection?.features?.length ? techSection.features : techFeatures
+
+const liveLabel = techSection?.mockupLabelLive ?? 'Updating live'
+const etaLabel  = techSection?.mockupLabelEta  ?? 'Estimated Arrival'
+const timeline  = techSection?.mockupTimeline?.length
+  ? techSection.mockupTimeline.map(s => s.label)
+  : ['Picked up', 'Sorting facility', 'In transit', 'Out for delivery', 'Delivered']
+
+const stepTimes = ['10:15 AM', '11:02 AM', 'Now', '—', '—']
+---
+
+<section class="section section--navy tech-section">
+  <div class="tech-container container">
+
+    <div class="tech-copy">
+      <span class="tag" data-reveal>{tag}</span>
+      <h2 class="section-title" data-reveal data-reveal-delay="80">
+        {title}<br/><em>{titleEm}</em>
+      </h2>
+      <p class="section-sub" data-reveal data-reveal-delay="160">{sub}</p>
+
+      <ul class="feature-list">
+        {features.map((f, i) => (
+          <li class="feature-item" data-reveal data-reveal-delay={String(i * 60)}>
+            <span class="feature-icon">{f.icon}</span>
+            <div>
+              <strong>{f.title}</strong>
+              <span>{f.desc}</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="tracking-mockup" data-reveal="right" data-reveal-delay="200" aria-label="Live tracking interface preview">
+      <div class="mockup-header">
+        <div class="mockup-dots">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <span class="mockup-title">parcel.bh/track</span>
+      </div>
+
+      <div class="mockup-body">
+        <div class="track-row">
+          <span class="order-id">PCL-00482</span>
+          <span class="status-pill">🟢 IN TRANSIT</span>
+        </div>
+
+        <div class="map-area">
+          <div class="map-grid"></div>
+          <svg class="map-route" viewBox="0 0 340 160" aria-hidden="true">
+            <path d="M30,130 C80,110 140,80 200,70 S280,50 320,40"
+                  fill="none" stroke="rgba(254,209,44,0.3)"
+                  stroke-width="2" stroke-dasharray="6 4"/>
+            <circle cx="30" cy="130" r="5" fill="#22c55e"/>
+            <circle cx="320" cy="40" r="5" fill="#ef4444"/>
+            <circle class="courier-dot" cx="0" cy="0" r="7" fill="#fed12c">
+              <animateMotion dur="6s" repeatCount="indefinite"
+                path="M30,130 C80,110 140,80 200,70 S280,50 320,40"/>
+            </circle>
+          </svg>
+          <div class="map-badge">
+            <span class="map-live-dot"></span>
+            {liveLabel}
+          </div>
+        </div>
+
+        <div class="track-timeline">
+          {timeline.map((label, idx) => (
+            <div class:list={['t-step', { done: idx <= 2, active: idx === 2 }]}>
+              <div class="t-dot"></div>
+              <span class="t-label">{label}</span>
+              <span class="t-time">{stepTimes[idx] ?? '—'}</span>
+            </div>
+          ))}
+        </div>
+
+        <div class="eta-row">
+          <span class="eta-label">{etaLabel}</span>
+          <span class="eta-time">2:30 PM</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .tech-section { padding: var(--section-y) var(--section-x); }
+
+  .tech-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .tracking-mockup {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0,0,0,0.4);
+  }
+
+  .mockup-body { padding: 16px 20px 20px; }
+
+  @media (max-width: 1023px) {
+    .tech-container { grid-template-columns: 1fr; gap: 60px; }
+  }
+</style>

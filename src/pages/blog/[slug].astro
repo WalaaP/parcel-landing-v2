@@ -1,0 +1,47 @@
+---
+import BlogPostLayout from '../../layouts/BlogPostLayout.astro'
+import { PortableText } from '@portabletext/react'
+
+export async function getStaticPaths() {
+  try {
+    const { client } = await import('../../lib/sanity')
+    const posts = await client.fetch(`*[_type == "post"]{ slug }`)
+    return posts.map((post: any) => ({ params: { slug: post.slug.current } }))
+  } catch {
+    return []
+  }
+}
+
+const { slug } = Astro.params
+let post: any = null
+
+try {
+  const { client } = await import('../../lib/sanity')
+  const { postBySlugQuery } = await import('../../lib/queries')
+  post = await client.fetch(postBySlugQuery, { slug })
+} catch {
+  // Handle gracefully
+}
+
+if (!post) {
+  return Astro.redirect('/blog')
+}
+---
+
+<BlogPostLayout
+  title={post.title}
+  description={post.excerpt}
+  publishedAt={post.publishedAt}
+  author={post.author?.name}
+  category={post.category}
+  ogImage={post.mainImage?.asset?.url}
+>
+  {post.mainImage?.asset?.url && (
+    <img
+      src={post.mainImage.asset.url}
+      alt={post.mainImage.alt || post.title}
+      style="width: 100%; border-radius: 12px; margin-bottom: 40px; border: 1px solid var(--border-subtle);"
+    />
+  )}
+  {post.body && <PortableText value={post.body} />}
+</BlogPostLayout>

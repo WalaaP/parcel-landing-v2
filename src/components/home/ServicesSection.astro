@@ -1,0 +1,31 @@
+---
+import ServiceCards3D from '../react/ServiceCards3D.tsx'
+import { services } from '../../data/services'
+
+interface Props {
+  servicesSection?: {
+    tag?: string
+    title?: string
+    titleEm?: string
+    sub?: string
+  }
+}
+
+const { servicesSection } = Astro.props
+const tag     = servicesSection?.tag     ?? 'Choose Your Speed'
+const title   = servicesSection?.title   ?? 'THREE TIERS.'
+const titleEm = servicesSection?.titleEm ?? 'ONE STANDARD.'
+const sub     = servicesSection?.sub     ?? 'Instant urgency or next-day planning — every delivery runs on the same real-time intelligence engine, built and operated from Manama.'
+---
+
+<section class="services-section section--dark">
+  <div class="services-header container" style="max-width: var(--max-width); margin: 0 auto; padding: var(--section-y) var(--section-x) 60px;">
+    <span class="tag" data-reveal>{tag}</span>
+    <h2 class="section-title" data-reveal data-reveal-delay="80">
+      {title}<br/><em>{titleEm}</em>
+    </h2>
+    <p class="section-sub" data-reveal data-reveal-delay="160">{sub}</p>
+  </div>
+
+  <ServiceCards3D services={services} client:visible />
+</section>

@@ -1,0 +1,98 @@
+---
+import BaseLayout       from '../layouts/BaseLayout.astro'
+import HeroSection      from '../components/home/HeroSection.astro'
+import StatsSection     from '../components/home/StatsSection.astro'
+import ServicesSection  from '../components/home/ServicesSection.astro'
+import TechSection      from '../components/home/TechSection.astro'
+import EcommerceSection from '../components/home/EcommerceSection.astro'
+import HowItWorks       from '../components/home/HowItWorks.astro'
+import ClientsSection   from '../components/home/ClientsSection.astro'
+import WhyUsSection     from '../components/home/WhyUsSection.astro'
+import AppSection       from '../components/home/AppSection.astro'
+import CtaSection       from '../components/home/CtaSection.astro'
+import SectionDivider   from '../components/shared/SectionDivider.astro'
+import { client as sanity } from '../lib/sanity'
+import { testimonialsQuery, clientsQuery, siteSettingsQuery } from '../lib/queries'
+import type { Client } from '../data/clients'
+import type { Stat } from '../data/stats'
+import type { Testimonial } from '../data/testimonials'
+
+const lang = 'en'
+
+let sanityClients:        Client[]      | undefined
+let sanityTestimonials:   Testimonial[] | undefined
+let sanityStats:          Stat[]        | undefined
+let sanityHero:           any           | undefined
+let sanityTicker:         string[]      | undefined
+let sanityTech:           any           | undefined
+let sanityHowItWorks:     any           | undefined
+let sanityWhyUs:          any           | undefined
+let sanityApp:            any           | undefined
+let sanityServicesHdr:    any           | undefined
+let sanityEcommerceHdr:   any           | undefined
+let sanityClientsHdr:     any           | undefined
+
+const configured =
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID &&
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID !== 'your-project-id'
+
+if (configured) {
+  try {
+    const [settings, rawClients, rawTestimonials] = await Promise.all([
+      sanity.fetch(siteSettingsQuery, { lang }),
+      sanity.fetch(clientsQuery,      { lang }),
+      sanity.fetch(testimonialsQuery,  { lang }),
+    ])
+
+    if (settings?.hero)                        sanityHero         = settings.hero
+    if (settings?.stats?.length)               sanityStats        = settings.stats
+    if (settings?.tickerItems?.length)         sanityTicker       = settings.tickerItems
+    if (settings?.techSection?.tag)            sanityTech         = settings.techSection
+    if (settings?.howItWorks?.tag)             sanityHowItWorks   = settings.howItWorks
+    if (settings?.whyUs?.tag)                  sanityWhyUs        = settings.whyUs
+    if (settings?.appSection?.tag)             sanityApp          = settings.appSection
+    if (settings?.servicesSection?.tag)        sanityServicesHdr  = settings.servicesSection
+    if (settings?.ecommerceSection?.tag)       sanityEcommerceHdr = settings.ecommerceSection
+    if (settings?.clientsSection?.tag)         sanityClientsHdr   = settings.clientsSection
+
+    if (rawClients?.length) {
+      sanityClients = rawClients.map((c: any) => ({
+        name:     c.name,
+        industry: c.industry ?? '',
+        initials: c.initials ?? c.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
+        color:    c.color ?? '#fed12c',
+        logo:     c.logo?.asset?.url,
+      }))
+    }
+    if (rawTestimonials?.length) {
+      sanityTestimonials = rawTestimonials.map((t: any) => ({
+        quote:    t.quote, name: t.name, role: t.role ?? '', company: t.company ?? '',
+        initials: t.initials ?? t.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
+        rating:   t.rating ?? 5,
+        avatar:   t.avatar?.asset?.url,
+      }))
+    }
+  } catch { /* fall through to local data */ }
+}
+---
+
+<BaseLayout
+  title="Bahrain's Most Advanced Delivery Network"
+  description="Parcel — Bahrain's most intelligent delivery network. Instant, same-day, and next-day delivery with real-time tracking and AI-powered routing across the GCC."
+>
+  <HeroSection hero={sanityHero} tickerItems={sanityTicker} />
+  <StatsSection stats={sanityStats} />
+  <SectionDivider />
+  <ServicesSection servicesSection={sanityServicesHdr} />
+  <SectionDivider />
+  <TechSection techSection={sanityTech} />
+  <SectionDivider />
+  <EcommerceSection ecommerceSection={sanityEcommerceHdr} />
+  <HowItWorks howItWorks={sanityHowItWorks} />
+  <SectionDivider />
+  <ClientsSection clients={sanityClients} testimonials={sanityTestimonials} clientsSection={sanityClientsHdr} />
+  <WhyUsSection whyUs={sanityWhyUs} />
+  <SectionDivider />
+  <AppSection appSection={sanityApp} />
+  <CtaSection />
+</BaseLayout>

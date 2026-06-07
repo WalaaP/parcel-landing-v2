@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageHero from '../../components/shared/PageHero.astro'
+import TrackingWidget from '../../components/react/TrackingWidget.tsx'
+import CtaSection from '../../components/home/CtaSection.astro'
+import { client as sanity } from '../../lib/sanity'
+import { siteSettingsQuery } from '../../lib/queries'
+import { useTranslations } from '../../i18n/utils'
+
+const t = useTranslations('ar')
+
+const localFeatures = [
+  { icon: '📱', title: t('track.f1Title'), desc: t('track.f1Desc') },
+  { icon: '🔔', title: t('track.f2Title'), desc: t('track.f2Desc') },
+  { icon: '📍', title: t('track.f3Title'), desc: t('track.f3Desc') },
+  { icon: '📷', title: t('track.f4Title'), desc: t('track.f4Desc') },
+]
+
+let features     = localFeatures
+let widgetLabels = { placeholder: undefined as string | undefined, trackBtn: undefined as string | undefined, notFoundMsg: undefined as string | undefined }
+
+const configured =
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID &&
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID !== 'your-project-id'
+
+if (configured) {
+  try {
+    const settings = await sanity.fetch(siteSettingsQuery, { lang: 'ar' })
+    if (settings?.trackingFeatures?.length) features = settings.trackingFeatures
+    if (settings?.trackingWidget) widgetLabels = settings.trackingWidget
+  } catch { /* use local data */ }
+}
+---
+
+<BaseLayout
+  title="تتبع طلبك"
+  description="تتبع أي توصيل من بارسل بشكل فوري. أدخل رقم طلبك لرؤية تحديثات GPS المباشرة وحالة التوصيل ووقت الوصول المتوقع."
+>
+  <PageHero
+    tag={t('track.tag')}
+    title={t('track.title')}
+    titleEm={t('track.titleEm')}
+    sub={t('track.sub')}
+    centered
+  />
+
+  <section class="tracking-section section section--navy">
+    <div class="tracking-wrap container">
+      <TrackingWidget placeholder={widgetLabels.placeholder} trackBtn={widgetLabels.trackBtn} notFoundMsg={widgetLabels.notFoundMsg} client:visible />
+    </div>
+  </section>
+
+  <section class="tracking-info section section--dark">
+    <div class="info-inner container">
+      <h2 class="section-title" data-reveal>{t('track.howTitle')}</h2>
+      <div class="info-grid">
+        {features.map((item, i) => (
+          <div class="info-card" data-reveal="scale" data-reveal-delay={String(i * 80)}>
+            <span class="info-icon">{item.icon}</span>
+            <h3>{item.title}</h3>
+            <p>{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaSection />
+</BaseLayout>
+
+<style>
+  .tracking-section { padding: var(--section-y) var(--section-x); }
+  .tracking-wrap { max-width: 760px; margin: 0 auto; }
+  .tracking-info { padding: var(--section-y) var(--section-x); }
+  .info-inner { max-width: var(--max-width); margin: 0 auto; }
+  .info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 56px; }
+  .info-card { background: var(--navy); border: 1px solid var(--border-subtle); border-radius: var(--card-radius); padding: 28px; transition: border-color 0.3s ease, transform 0.3s ease; }
+  .info-card:hover { border-color: var(--border); transform: translateY(-4px); }
+  .info-icon { font-size: 28px; display: block; margin-bottom: 14px; }
+  .info-card h3 { font-family: var(--font-ui); font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .info-card p  { font-size: 14px; color: var(--ink-muted); line-height: 1.65; }
+  @media (max-width: 1023px) { .info-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 639px)  { .info-grid { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,246 @@
+---
+import { hero as localHero } from '../../data/hero'
+import { tickerItems as localTicker } from '../../data/ticker'
+
+interface HeroData {
+  eyebrow: string
+  titleLine1: string
+  titleLine2: string
+  titleLine3: string
+  description: string
+  ctaPrimaryLabel: string
+  ctaPrimaryHref: string
+  ctaGhostLabel: string
+  ctaGhostHref: string
+  backgroundImage?: string
+}
+
+interface Props {
+  hero?:        HeroData
+  tickerItems?: string[]
+}
+
+const {
+  hero        = { ...localHero, ctaPrimaryLabel: localHero.ctaPrimary.label, ctaPrimaryHref: localHero.ctaPrimary.href, ctaGhostLabel: localHero.ctaGhost.label, ctaGhostHref: localHero.ctaGhost.href },
+  tickerItems = localTicker,
+} = Astro.props
+
+const repeated = Array(3).fill(tickerItems).flat()
+---
+
+<div class="ticker-bar" role="marquee" aria-label="Live updates">
+  <div class="ticker-inner">
+    {repeated.map((item) => (
+      <span class="ticker-item">{item}</span>
+    ))}
+  </div>
+</div>
+
+<section class="hero" aria-label="Hero">
+
+  <svg class="route-network" viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <radialGradient id="node-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"   stop-color="#fed12c" stop-opacity="0.6"/>
+        <stop offset="100%" stop-color="#fed12c" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <path class="r-line"         d="M200,600 C350,500 550,400 750,300 S1050,200 1250,150"/>
+    <path class="r-line"         d="M100,700 C250,620 500,500 800,420 S1100,350 1350,280"/>
+    <path class="r-line delay-1" d="M350,650 C500,580 680,480 900,400 S1150,300 1320,220"/>
+    <path class="r-line delay-2" d="M50,550 C200,480 450,380 700,320 S980,240 1200,180"/>
+    <circle class="r-node"         cx="750" cy="300" r="5"/>
+    <circle class="r-node delay-1" cx="500" cy="420" r="4"/>
+    <circle class="r-node delay-2" cx="900" cy="360" r="4"/>
+    <circle class="r-node delay-3" cx="1100" cy="240" r="3"/>
+    <circle class="r-dot" r="3">
+      <animateMotion dur="8s" repeatCount="indefinite" path="M200,600 C350,500 550,400 750,300 S1050,200 1250,150"/>
+    </circle>
+    <circle class="r-dot delay-2" r="2.5">
+      <animateMotion dur="11s" repeatCount="indefinite" path="M100,700 C250,620 500,500 800,420 S1100,350 1350,280"/>
+    </circle>
+    <circle class="r-dot delay-4" r="2">
+      <animateMotion dur="9s" repeatCount="indefinite" path="M50,550 C200,480 450,380 700,320 S980,240 1200,180"/>
+    </circle>
+  </svg>
+
+  <div class="hero-photo" style={`background-image: url('${hero.backgroundImage ?? localHero.backgroundImage}')`} aria-hidden="true"></div>
+
+  <div class="hero-content">
+
+    <div class="hero-eyebrow" data-reveal>
+      <span class="live-dot"></span>
+      <span>{hero.eyebrow}</span>
+    </div>
+
+    <h1 class="hero-title">
+      <span class="title-line tl-1">{hero.titleLine1}</span>
+      <span class="title-line tl-2">{hero.titleLine2.replace('.', '')}<em>.</em></span>
+      <span class="title-line tl-3">{hero.titleLine3.replace('.', '')}<em>.</em></span>
+    </h1>
+
+    <p class="hero-desc">{hero.description}</p>
+
+    <div class="hero-actions">
+      <a href={hero.ctaPrimaryHref} class="btn-hero-primary" data-cursor-expand>{hero.ctaPrimaryLabel}</a>
+      <a href={hero.ctaGhostHref}   class="btn-hero-ghost"   data-cursor-expand>{hero.ctaGhostLabel}</a>
+    </div>
+
+  </div>
+
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background-color: var(--void);
+  }
+  .hero-photo {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.18;
+    animation: kenBurns 26s ease-in-out infinite alternate;
+  }
+  @keyframes kenBurns {
+    from { transform: scale(1); }
+    to   { transform: scale(1.06); }
+  }
+  .route-network {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .r-line {
+    fill: none;
+    stroke: var(--signal);
+    stroke-width: 1;
+    stroke-dasharray: 8 6;
+    opacity: 0.15;
+    stroke-dashoffset: 1000;
+    animation: drawRoute 20s linear infinite;
+  }
+  .r-line.delay-1 { animation-delay: -5s;  opacity: 0.10; }
+  .r-line.delay-2 { animation-delay: -10s; opacity: 0.08; }
+  @keyframes drawRoute {
+    from { stroke-dashoffset: 1000; }
+    to   { stroke-dashoffset: -1000; }
+  }
+  .r-node {
+    fill: var(--signal);
+    opacity: 0;
+    animation: nodeAppear 4s ease-in-out infinite;
+  }
+  .r-node.delay-1 { animation-delay: -1s; }
+  .r-node.delay-2 { animation-delay: -2s; }
+  .r-node.delay-3 { animation-delay: -3s; }
+  @keyframes nodeAppear {
+    0%, 100% { opacity: 0; }
+    50%      { opacity: 0.5; }
+  }
+  .r-dot { fill: var(--signal); opacity: 0.8; filter: drop-shadow(0 0 4px #fed12c); }
+  .r-dot.delay-2 { animation-delay: -3s; }
+  .r-dot.delay-4 { animation-delay: -6s; }
+  .hero-content {
+    position: relative;
+    z-index: 5;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 100px var(--section-x) 80px;
+    width: 100%;
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 28px;
+    animation: fadeUp 0.7s var(--ease-out) both 0.2s;
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(88px, 13vw, 160px);
+    line-height: 0.92;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+    margin-bottom: 36px;
+    overflow: hidden;
+  }
+  .title-line { display: block; color: var(--ink); }
+  .title-line em { color: var(--signal); font-style: normal; }
+  .tl-1 { animation: titleReveal 0.9s var(--ease-out) both 0.3s; }
+  .tl-2 { animation: titleReveal 0.9s var(--ease-out) both 0.45s; }
+  .tl-3 { animation: titleReveal 0.9s var(--ease-out) both 0.6s; }
+  @keyframes titleReveal {
+    from { opacity: 0; transform: translateY(60px) skewY(2deg); }
+    to   { opacity: 1; transform: none; }
+  }
+  .hero-desc {
+    font-size: clamp(16px, 1.2vw, 19px);
+    color: var(--ink-muted);
+    max-width: 520px;
+    line-height: 1.75;
+    animation: fadeUp 0.9s var(--ease-out) both 0.75s;
+  }
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.9s var(--ease-out) both 0.9s;
+  }
+  .btn-hero-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--signal);
+    color: var(--ink-inverse);
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 15px;
+    padding: 15px 36px;
+    border-radius: var(--pill-radius);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    letter-spacing: 0.01em;
+  }
+  .btn-hero-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 50px rgba(254, 209, 44, 0.45);
+    background: var(--signal-dim);
+  }
+  .btn-hero-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 15px;
+    padding: 14px 28px;
+    border-radius: var(--pill-radius);
+    border: 1px solid var(--border-subtle);
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  .btn-hero-ghost:hover {
+    border-color: var(--border);
+    color: var(--signal);
+    background: var(--signal-ghost);
+  }
+  @media (max-width: 767px) {
+    .hero-title { font-size: clamp(64px, 18vw, 100px); }
+  }
+</style>

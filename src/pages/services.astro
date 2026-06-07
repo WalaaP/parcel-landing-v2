@@ -1,0 +1,147 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import PageHero from '../components/shared/PageHero.astro'
+import FaqAccordion from '../components/react/FaqAccordion.tsx'
+import CtaSection from '../components/home/CtaSection.astro'
+import { servicesFaqs as localFaqs } from '../data/faqs'
+import { services as localServices } from '../data/services'
+import { client as sanity } from '../lib/sanity'
+import { siteSettingsQuery } from '../lib/queries'
+
+const localTiers = localServices.map(s => ({
+  id:       s.id,
+  tier:     s.tier,
+  badge:    s.badge,
+  color:    s.accentColor,
+  headline: s.id === 'instant'  ? 'Within Hours, City-Wide.'
+          : s.id === 'sameday'  ? 'Order Now. In Hands by Evening.'
+          :                       'Scheduled Precision, Nationwide.',
+  desc:    s.id === 'instant'
+    ? "When urgency is non-negotiable, Instant delivery is your answer. A courier is matched to your order within minutes and dispatched immediately. Built for medical supply chains, luxury retail, and any business where every hour counts."
+    : s.id === 'sameday'
+    ? "Parcel's most popular tier. Smart multi-stop routing means multiple orders can be batched efficiently — giving you competitive pricing without compromising on speed. Most deliveries complete before close of business."
+    : "For planned deliveries and high-volume businesses, Next Day gives you the best rates with complete reliability. Flexible pickup windows, consolidated warehousing, and coverage across the entire GCC make this the backbone for e-commerce operations.",
+  features: s.id === 'instant'
+    ? ['Courier matched in under 5 minutes','GPS updated every 30 seconds','Live ETA with real-time recalculation','Contactless or signed delivery','Immediate proof of delivery (photo + GPS)','Priority routing over all other tiers']
+    : s.id === 'sameday'
+    ? ['Smart batched route optimization','Automated dispatch via Parcel AI','Proactive SMS + email at every stage','Contactless or signed delivery','Full digital proof of delivery','Merchant analytics dashboard access']
+    : ['Flexible morning, afternoon, or evening pickup','Warehousing & consolidation available','Volume pricing for 50+ orders/day','API integration for auto-booking','Full GCC coverage (BH, SA, UAE, KW, QA, OM)','Monthly consolidated invoicing'],
+  coverage: s.id === 'nextday' ? 'Bahrain + GCC (Saudi Arabia, UAE, Kuwait, Qatar, Oman)' : 'Kingdom of Bahrain',
+  window:   s.id === 'instant' ? 'Within 2–4 hours' : s.id === 'sameday' ? 'Same business day (order before 2 PM)' : 'Next business day',
+}))
+
+let tiers = localTiers
+let faqs  = localFaqs
+
+const configured =
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID &&
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID !== 'your-project-id'
+
+if (configured) {
+  try {
+    const settings = await sanity.fetch(siteSettingsQuery, { lang: 'en' })
+    if (settings?.services?.length) {
+      tiers = settings.services.map((s: any) => ({
+        id:       s.id,
+        tier:     s.tier,
+        badge:    s.badge,
+        color:    s.accentColor,
+        headline: s.headline,
+        desc:     s.desc,
+        features: s.features ?? [],
+        coverage: s.coverage,
+        window:   s.window,
+      }))
+    }
+    if (settings?.servicesFaqs?.length) faqs = settings.servicesFaqs
+  } catch { /* use local data */ }
+}
+---
+
+<BaseLayout
+  title="Delivery Services"
+  description="Three delivery tiers — Instant, Same Day, and Next Day — built on Bahrain's most advanced logistics network. Choose your speed, trust our intelligence."
+>
+  <PageHero
+    tag="Delivery Services"
+    title="THREE SPEEDS."
+    titleEm="ONE PLATFORM."
+    sub="Choose the tier that matches your urgency. All three run on the same real-time AI engine — delivering reliability at every speed."
+    cta={{ label: 'Get a Quote', href: '/contact' }}
+  />
+
+  <section class="tiers-section">
+    {tiers.map(tier => (
+      <div id={tier.id} class="tier-block">
+        <div class="tier-inner container">
+          <div class="tier-header">
+            <span class="tier-badge" style={`background: ${tier.color}22; color: ${tier.color}; border-color: ${tier.color}44`}>{tier.badge}</span>
+            <h2 class="tier-name" style={`color: ${tier.color}`}>{tier.tier}</h2>
+            <h3 class="tier-headline">{tier.headline}</h3>
+            <p class="tier-desc">{tier.desc}</p>
+          </div>
+          <div class="tier-details">
+            <div class="tier-features">
+              <h4>What's included</h4>
+              <ul>
+                {tier.features.map((f: string) => (
+                  <li>
+                    <span style={`color: ${tier.color}`}>✓</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div class="tier-meta">
+              <div class="meta-item">
+                <span class="meta-label">Coverage</span>
+                <span class="meta-value">{tier.coverage}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Delivery Window</span>
+                <span class="meta-value">{tier.window}</span>
+              </div>
+              <a href="/contact" class="tier-cta" style={`background: ${tier.color}; color: ${tier.id === 'sameday' ? '#09273d' : '#fff'}`} data-cursor-expand>
+                Get Started →
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <section class="faq-section section section--navy">
+    <div class="container" style="max-width: 800px;">
+      <span class="tag" data-reveal>FAQ</span>
+      <h2 class="section-title" data-reveal data-reveal-delay="80">COMMON <em>QUESTIONS.</em></h2>
+      <div style="margin-top: 48px;">
+        <FaqAccordion items={faqs} client:visible />
+      </div>
+    </div>
+  </section>
+
+  <CtaSection />
+</BaseLayout>
+
+<style>
+  .tiers-section { background: var(--void); }
+  .tier-block { padding: var(--section-y) var(--section-x); border-bottom: 1px solid var(--border-subtle); }
+  .tier-block:nth-child(even) { background: var(--navy); }
+  .tier-inner { max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .tier-badge { display: inline-flex; font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 14px; border-radius: 100px; border: 1px solid; margin-bottom: 12px; }
+  .tier-name { font-family: var(--font-display); font-size: clamp(64px, 8vw, 96px); font-weight: 900; text-transform: uppercase; line-height: 0.9; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .tier-headline { font-family: var(--font-ui); font-size: clamp(18px, 2vw, 24px); font-weight: 600; color: var(--ink); margin-bottom: 16px; }
+  .tier-desc { font-size: 16px; color: var(--ink-muted); line-height: 1.75; }
+  .tier-features h4 { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--signal); margin-bottom: 20px; }
+  .tier-features ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .tier-features li { display: flex; gap: 10px; font-family: var(--font-ui); font-size: 15px; color: var(--ink); }
+  .tier-meta { margin-top: 32px; display: flex; flex-direction: column; gap: 16px; }
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label { font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
+  .meta-value { font-family: var(--font-ui); font-size: 14px; font-weight: 500; color: var(--ink); }
+  .tier-cta { display: inline-flex; align-self: flex-start; font-family: var(--font-ui); font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 100px; margin-top: 8px; transition: transform 0.2s ease; }
+  .tier-cta:hover { transform: translateY(-2px); }
+  .faq-section { padding: var(--section-y) var(--section-x); }
+  @media (max-width: 1023px) { .tier-inner { grid-template-columns: 1fr; gap: 40px; } }
+</style>

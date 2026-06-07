@@ -1,0 +1,202 @@
+---
+interface AppSectionData {
+  tag?: string; title?: string; titleEm?: string; sub?: string
+  appStoreLbl?: string; appStoreHref?: string
+  googlePlayLbl?: string; googlePlayHref?: string
+}
+interface Props { appSection?: AppSectionData }
+
+const { appSection } = Astro.props
+
+const tag           = appSection?.tag           ?? 'Available Everywhere'
+const title         = appSection?.title         ?? 'TRACK ON'
+const titleEm       = appSection?.titleEm       ?? 'ANY DEVICE.'
+const sub           = appSection?.sub           ?? 'The Parcel tracking portal works seamlessly on web, mobile, and tablet. Share live tracking links with your customers — no app download required.'
+const appStoreLbl   = appSection?.appStoreLbl   ?? 'Download on the App Store'
+const appStoreHref  = appSection?.appStoreHref  ?? '#'
+const googlePlayLbl = appSection?.googlePlayLbl  ?? 'Get it on Google Play'
+const googlePlayHref = appSection?.googlePlayHref ?? '#'
+---
+
+<section class="section section--dark app-section">
+  <div class="app-inner container">
+
+    <div class="app-copy">
+      <span class="tag" data-reveal>{tag}</span>
+      <h2 class="section-title" data-reveal data-reveal-delay="80">
+        {title}<br/><em>{titleEm}</em>
+      </h2>
+      <p class="section-sub" data-reveal data-reveal-delay="160">{sub}</p>
+
+      <div class="app-links" data-reveal data-reveal-delay="240">
+        <a href={appStoreHref} class="app-btn" data-cursor-expand>
+          <span class="app-btn-icon">📱</span>
+          <div>
+            <span class="app-btn-main">{appStoreLbl}</span>
+          </div>
+        </a>
+        <a href={googlePlayHref} class="app-btn" data-cursor-expand>
+          <span class="app-btn-icon">🤖</span>
+          <div>
+            <span class="app-btn-main">{googlePlayLbl}</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="app-mockup" data-reveal="right" data-reveal-delay="200" aria-hidden="true">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="phone-header">
+            <span class="ph-time">10:42</span>
+            <span class="ph-logo"><em>Par</em>cel</span>
+          </div>
+          <div class="phone-content">
+            <div class="ph-map-area">
+              <div class="ph-map-bg"></div>
+              <svg viewBox="0 0 200 120" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+                <circle cx="100" cy="60" r="8" fill="#fed12c" opacity="0.3">
+                  <animate attributeName="r" values="8;16;8" dur="2s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/>
+                </circle>
+                <circle cx="100" cy="60" r="5" fill="#fed12c"/>
+              </svg>
+            </div>
+            <div class="ph-order">
+              <div class="ph-order-id">PCL-00482</div>
+              <div class="ph-status">In Transit · ETA 2:30 PM</div>
+            </div>
+            <div class="ph-progress">
+              <div class="ph-bar">
+                <div class="ph-fill" style="width: 60%"></div>
+              </div>
+              <div class="ph-steps">
+                <span class="done">✓</span>
+                <span class="done">✓</span>
+                <span class="active">●</span>
+                <span>○</span>
+                <span>○</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .app-section { padding: var(--section-y) var(--section-x); }
+
+  .app-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .app-links {
+    display: flex;
+    gap: 12px;
+    margin-top: 36px;
+    flex-wrap: wrap;
+  }
+
+  .app-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--navy);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 14px 20px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    color: var(--ink);
+  }
+  .app-btn:hover { border-color: var(--border); transform: translateY(-2px); }
+
+  .app-btn-icon { font-size: 24px; }
+  .app-btn-main {
+    display: block;
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .app-mockup { display: flex; justify-content: center; }
+
+  .phone-frame {
+    width: 260px;
+    background: var(--navy-mid);
+    border: 2px solid var(--border);
+    border-radius: 36px;
+    padding: 12px;
+    position: relative;
+    box-shadow: 0 40px 120px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+  }
+
+  .phone-notch {
+    width: 60px; height: 8px;
+    background: var(--void);
+    border-radius: 4px;
+    margin: 0 auto 12px;
+  }
+
+  .phone-screen {
+    background: var(--void);
+    border-radius: 24px;
+    overflow: hidden;
+    min-height: 420px;
+  }
+
+  .phone-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .ph-time { font-family: monospace; font-size: 12px; color: var(--ink-faint); }
+  .ph-logo { font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--ink); }
+  .ph-logo em { color: var(--signal); font-style: normal; }
+
+  .phone-content { padding: 16px; }
+
+  .ph-map-area {
+    position: relative;
+    height: 140px;
+    background: #0d2e44;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .ph-map-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .ph-order { margin-bottom: 16px; }
+  .ph-order-id { font-family: monospace; font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .ph-status   { font-family: var(--font-ui); font-size: 12px; color: var(--pulse-green); }
+
+  .ph-bar { height: 4px; background: var(--navy-mid); border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
+  .ph-fill { height: 100%; background: var(--signal); border-radius: 2px; }
+
+  .ph-steps { display: flex; justify-content: space-between; font-size: 12px; }
+  .ph-steps span  { color: var(--ink-faint); }
+  .ph-steps .done   { color: var(--green); }
+  .ph-steps .active { color: var(--signal); }
+
+  @media (max-width: 1023px) {
+    .app-inner { grid-template-columns: 1fr; gap: 60px; }
+    .app-mockup { order: -1; }
+  }
+</style>

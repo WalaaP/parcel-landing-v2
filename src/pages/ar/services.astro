@@ -1,0 +1,156 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageHero from '../../components/shared/PageHero.astro'
+import FaqAccordion from '../../components/react/FaqAccordion.tsx'
+import CtaSection from '../../components/home/CtaSection.astro'
+import { client as sanity } from '../../lib/sanity'
+import { siteSettingsQuery } from '../../lib/queries'
+
+const localTiers = [
+  {
+    id: 'instant', color: '#ff4d4d', badge: '⚡ فوري', tier: 'فوري',
+    headline: 'في غضون ساعات، في جميع أنحاء المدينة.',
+    desc: 'عندما تكون العجلة أمراً لا يُتنازل عنه، التوصيل الفوري هو الإجابة. يُطابَق ساعٍ بطلبك في غضون دقائق ويُرسَل فوراً.',
+    features: ['مطابقة ساعٍ في أقل من 5 دقائق','تحديث GPS كل 30 ثانية','وقت وصول متوقع مباشر مع إعادة حساب فورية','توصيل بدون تلامس أو بتوقيع','إثبات توصيل فوري (صورة + GPS)','توجيه أولوي على جميع المستويات الأخرى'],
+    coverage: 'مملكة البحرين', window: 'في غضون 2–4 ساعات',
+  },
+  {
+    id: 'sameday', color: '#fed12c', badge: '🌅 نفس اليوم', tier: 'نفس اليوم',
+    headline: 'اطلب الآن. في اليدين بحلول المساء.',
+    desc: 'المستوى الأكثر شعبية من بارسل. يعني التوجيه الذكي متعدد المحطات إمكانية تجميع طلبات متعددة بكفاءة — مما يمنحك أسعاراً تنافسية دون المساس بالسرعة.',
+    features: ['تحسين المسار الذكي المُجمَّع','إرسال تلقائي عبر بارسل AI','إشعارات SMS وبريد إلكتروني في كل مرحلة','توصيل بدون تلامس أو بتوقيع','إثبات توصيل رقمي كامل','لوحة تحليلات التاجر'],
+    coverage: 'مملكة البحرين', window: 'نفس يوم العمل (الطلب قبل الساعة 2 مساءً)',
+  },
+  {
+    id: 'nextday', color: '#8fa8be', badge: '📅 اليوم التالي', tier: 'اليوم التالي',
+    headline: 'دقة مجدولة، تغطية وطنية.',
+    desc: 'للتوصيلات المخططة والشركات ذات الحجم الكبير، يمنحك اليوم التالي أفضل الأسعار مع موثوقية كاملة.',
+    features: ['نوافذ استلام مرنة: صباح أو ظهر أو مساء','تخزين وتوحيد متاح','أسعار الحجم لأكثر من 50 طلباً يومياً','تكامل API للحجز التلقائي','تغطية الخليج الكاملة (البحرين، السعودية، الإمارات، الكويت، قطر، عُمان)','فواتير شهرية موحدة'],
+    coverage: 'البحرين + دول الخليج (السعودية، الإمارات، الكويت، قطر، عُمان)', window: 'يوم العمل التالي',
+  },
+]
+
+const localFaqs = [
+  { question: 'ما هو الفرق بين التوصيل الفوري والتوصيل في نفس اليوم؟', answer: 'التوصيل الفوري يُرسَل على الفور (في غضون 2-4 ساعات) بساعٍ مخصص. أما التوصيل في نفس اليوم، فيستخدم توجيهاً ذكياً مُجمَّعاً ويصل بحلول نهاية يوم العمل.' },
+  { question: 'ما هي مناطق التغطية لديكم؟', answer: 'تغطي جميع مستويات التوصيل لدينا مملكة البحرين بالكامل. يمتد مستوى اليوم التالي أيضاً إلى دول الخليج: السعودية والإمارات والكويت وقطر وعُمان.' },
+  { question: 'كيف أتتبع طلبيتي؟', answer: 'تتلقى رابط تتبع مباشر فور تأكيد طلبك. يتحدث موقع الساعي كل 30 ثانية، ويُعاد حساب وقت الوصول ديناميكياً.' },
+  { question: 'هل يمكنني دمج API الخاص بكم مع نظامي الحالي؟', answer: 'نعم. يتكامل API REST الخاص بنا مع جميع الأنظمة الرئيسية. وثائقنا كاملة ومتاحة، ومعدل استجابة فريق الدعم للمطورين هو أقل من ساعة.' },
+  { question: 'هل يمكن الاستلام من مواقع متعددة؟', answer: 'نعم — جميع خطط الأعمال تدعم الاستلام متعدد المواقع. يمكنك تكوين مستودعات الاستلام المفضلة عبر لوحة التحكم أو عبر API.' },
+  { question: 'كيف تُحسب الأسعار؟', answer: 'يعتمد التسعير على المستوى (فوري / نفس اليوم / اليوم التالي)، والمسافة، والحجم. للشركات الكبيرة التي ترسل أكثر من 50 طلباً يومياً، لدينا خطط حجمية توفر حتى 40% من التكلفة.' },
+]
+
+let tiers = localTiers
+let faqs  = localFaqs
+
+const configured =
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID &&
+  import.meta.env.PUBLIC_SANITY_PROJECT_ID !== 'your-project-id'
+
+if (configured) {
+  try {
+    const settings = await sanity.fetch(siteSettingsQuery, { lang: 'ar' })
+    if (settings?.services?.length) {
+      tiers = settings.services.map((s: any) => ({
+        id:       s.id,
+        tier:     s.tier,
+        badge:    s.badge,
+        color:    s.accentColor,
+        headline: s.headline,
+        desc:     s.desc,
+        features: s.features ?? [],
+        coverage: s.coverage,
+        window:   s.window,
+      }))
+    }
+    if (settings?.servicesFaqs?.length) faqs = settings.servicesFaqs
+  } catch { /* use local data */ }
+}
+---
+
+<BaseLayout
+  title="خدمات التوصيل"
+  description="ثلاثة مستويات للتوصيل — فوري ونفس اليوم واليوم التالي — مبنية على أكثر شبكات اللوجستيات تطوراً في البحرين."
+>
+  <PageHero
+    tag="خدمات التوصيل"
+    title="ثلاث سرعات."
+    titleEm="منصة واحدة."
+    sub="اختر المستوى الذي يناسب عجلتك. الثلاثة يعملون على نفس محرك AI الفوري — موثوقية في كل سرعة."
+    cta={{ label: 'احصل على عرض سعر', href: '/ar/contact' }}
+  />
+
+  <section class="tiers-section">
+    {tiers.map(tier => (
+      <div id={tier.id} class="tier-block">
+        <div class="tier-inner container">
+          <div class="tier-header">
+            <span class="tier-badge" style={`background: ${tier.color}22; color: ${tier.color}; border-color: ${tier.color}44`}>{tier.badge}</span>
+            <h2 class="tier-name" style={`color: ${tier.color}`}>{tier.tier}</h2>
+            <h3 class="tier-headline">{tier.headline}</h3>
+            <p class="tier-desc">{tier.desc}</p>
+          </div>
+          <div class="tier-details">
+            <div class="tier-features">
+              <h4>ما يشمله المستوى</h4>
+              <ul>
+                {tier.features.map((f: string) => (
+                  <li>
+                    <span style={`color: ${tier.color}`}>✓</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div class="tier-meta">
+              <div class="meta-item">
+                <span class="meta-label">نطاق التغطية</span>
+                <span class="meta-value">{tier.coverage}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">نافذة التوصيل</span>
+                <span class="meta-value">{tier.window}</span>
+              </div>
+              <a href="/ar/contact" class="tier-cta" style={`background: ${tier.color}; color: ${tier.id === 'sameday' ? '#09273d' : '#fff'}`} data-cursor-expand>
+                ابدأ الآن ←
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <section class="faq-section section section--navy">
+    <div class="container" style="max-width: 800px;">
+      <span class="tag" data-reveal>الأسئلة الشائعة</span>
+      <h2 class="section-title" data-reveal data-reveal-delay="80">أسئلة <em>شائعة.</em></h2>
+      <div style="margin-top: 48px;">
+        <FaqAccordion items={faqs} client:visible />
+      </div>
+    </div>
+  </section>
+
+  <CtaSection />
+</BaseLayout>
+
+<style>
+  .tiers-section { background: var(--void); }
+  .tier-block { padding: var(--section-y) var(--section-x); border-bottom: 1px solid var(--border-subtle); }
+  .tier-block:nth-child(even) { background: var(--navy); }
+  .tier-inner { max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .tier-badge { display: inline-flex; font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 14px; border-radius: 100px; border: 1px solid; margin-bottom: 12px; }
+  .tier-name { font-family: var(--font-display); font-size: clamp(64px, 8vw, 96px); font-weight: 900; text-transform: uppercase; line-height: 0.9; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .tier-headline { font-family: var(--font-ui); font-size: clamp(18px, 2vw, 24px); font-weight: 600; color: var(--ink); margin-bottom: 16px; }
+  .tier-desc { font-size: 16px; color: var(--ink-muted); line-height: 1.75; }
+  .tier-features h4 { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--signal); margin-bottom: 20px; }
+  .tier-features ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .tier-features li { display: flex; gap: 10px; font-family: var(--font-ui); font-size: 15px; color: var(--ink); }
+  .tier-meta { margin-top: 32px; display: flex; flex-direction: column; gap: 16px; }
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label { font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
+  .meta-value { font-family: var(--font-ui); font-size: 14px; font-weight: 500; color: var(--ink); }
+  .tier-cta { display: inline-flex; align-self: flex-start; font-family: var(--font-ui); font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 100px; margin-top: 8px; transition: transform 0.2s ease; }
+  .tier-cta:hover { transform: translateY(-2px); }
+  .faq-section { padding: var(--section-y) var(--section-x); }
+  @media (max-width: 1023px) { .tier-inner { grid-template-columns: 1fr; gap: 40px; } }
+</style>

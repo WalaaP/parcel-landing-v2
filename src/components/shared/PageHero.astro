@@ -1,0 +1,115 @@
+---
+interface Props {
+  tag?:     string
+  title:    string
+  titleEm?: string
+  sub?:     string
+  cta?:     { label: string; href: string }
+  ctaGhost?: { label: string; href: string }
+  centered?: boolean
+}
+
+const { tag, title, titleEm, sub, cta, ctaGhost, centered = false } = Astro.props
+---
+
+<section class:list={['page-hero', { 'page-hero--centered': centered }]}>
+  <div class="page-hero-inner">
+    {tag && <span class="tag" data-reveal>{tag}</span>}
+    <h1 class="page-hero-title" data-reveal data-reveal-delay="80">
+      {title}
+      {titleEm && <em>{titleEm}</em>}
+    </h1>
+    {sub && (
+      <p class="page-hero-sub" data-reveal data-reveal-delay="160">{sub}</p>
+    )}
+    {(cta || ctaGhost) && (
+      <div class="page-hero-actions" data-reveal data-reveal-delay="240">
+        {cta      && <a href={cta.href}      class="btn-primary"  data-cursor-expand>{cta.label} →</a>}
+        {ctaGhost && <a href={ctaGhost.href} class="btn-ghost"    data-cursor-expand>{ctaGhost.label}</a>}
+      </div>
+    )}
+  </div>
+
+  <div class="page-hero-line" aria-hidden="true"></div>
+</section>
+
+<style>
+  .page-hero {
+    padding: 140px var(--section-x) var(--section-y);
+    background: var(--void);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--signal), transparent);
+    opacity: 0.4;
+  }
+
+  .page-hero-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  .page-hero--centered .page-hero-inner {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .page-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--ink);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    max-width: 900px;
+  }
+
+  .page-hero-title em {
+    color: var(--signal);
+    font-style: normal;
+    display: block;
+  }
+
+  .page-hero-sub {
+    font-size: clamp(15px, 1.2vw, 18px);
+    color: var(--ink-muted);
+    line-height: 1.75;
+    max-width: 560px;
+    margin-bottom: 0;
+  }
+
+  .page-hero--centered .page-hero-sub {
+    text-align: center;
+    max-width: 600px;
+  }
+
+  .page-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 36px;
+    flex-wrap: wrap;
+  }
+
+  .page-hero--centered .page-hero-actions {
+    justify-content: center;
+  }
+
+  .page-hero-line {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--border-subtle);
+    overflow: hidden;
+  }
+</style>

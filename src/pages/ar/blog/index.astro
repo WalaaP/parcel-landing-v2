@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import PageHero from '../../../components/shared/PageHero.astro'
+import BlogFilter from '../../../components/react/BlogFilter.tsx'
+import { useTranslations } from '../../../i18n/utils'
+
+const t = useTranslations('ar')
+const lang = 'ar'
+
+let posts: any[] = []
+try {
+  const { client } = await import('../../../lib/sanity')
+  const { postsQuery } = await import('../../../lib/queries')
+  posts = await client.fetch(postsQuery, { lang })
+} catch {
+  posts = []
+}
+---
+
+<BaseLayout
+  title="المدونة"
+  description="رؤى حول اللوجستيات والتجارة الإلكترونية ومستقبل التوصيل في البحرين ودول الخليج — من فريق بارسل."
+>
+  <PageHero
+    tag={t('blog.tag')}
+    title={t('blog.title')}
+    titleEm={t('blog.titleEm')}
+    sub={t('blog.sub')}
+    centered
+  />
+
+  <section class="blog-list-section section section--dark">
+    <div class="container" style="max-width: var(--max-width); padding: 0 var(--section-x) var(--section-y);">
+      {posts.length > 0 ? (
+        <BlogFilter posts={posts} client:visible />
+      ) : (
+        <div class="blog-empty">
+          <span class="empty-icon">📝</span>
+          <h2>{t('blog.noPosts')}</h2>
+          <p>{t('blog.noPostsSub')}</p>
+          <a href="/ar/contact" class="btn-primary" style="margin-top: 24px;">{t('cta.contactUs')}</a>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-list-section { padding-top: 0; }
+  .blog-empty { text-align: center; padding: 80px 32px; display: flex; flex-direction: column; align-items: center; }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+  .blog-empty h2 { font-family: var(--font-display); font-size: 36px; font-weight: 700; text-transform: uppercase; color: var(--ink); margin-bottom: 8px; }
+  .blog-empty p  { color: var(--ink-muted); font-size: 16px; }
+</style>
